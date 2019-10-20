@@ -1,18 +1,19 @@
 #include "idt.h"
 #include "x86_desc.h"
+#include "keyboard.h"
 //this code sets up an entry into the Interrupt Descriptor Table
 //your IDT must contain entries for exceptions, a few interrupts, system calls
 
 //		31....16     16 15   
 /*|Offset 31...16|P |DPL |0D110|000|    | */
-#define pointersSize 19
+#define pointersSize 21
 
 unsigned long long * addr;
 
 //static pointers[pointersSize];
 typedef char (* const shit) (void);
 static shit pointers[] = {de, db, nmi, bp, of, br, ud, nm, df, cpso, ts, np, ssf, gp, pf, ir, 
-                        mf, ac, mc, xf};
+                        mf, ac, mc, xf, tc, keyboard};
 
 void fill_idt(unsigned long long * idt_addr){
     addr = idt_addr;
@@ -54,3 +55,12 @@ char mf(){printf("ERROR\n");return 0;} //x87 FPU error
 char ac(){printf("ERROR\n");return 0;} //alignment check ---> return zero
 char mc(){printf("ERROR\n");return 0;} //machine check
 char xf(){printf("ERROR\n");return 0;} //simd floating point exception
+char tc(){printf("ERROR\n");return 0;} //timing chip
+
+// call our keyboard handler
+char keyboard(){
+    unsigned int keyboard_data;
+    keyboard_data = inb(0x60);
+    keyboard_handler(keyboard_data);
+    return 0;
+} //divide error
