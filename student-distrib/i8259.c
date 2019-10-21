@@ -25,22 +25,24 @@ void i8259_init(void) {
   // master_mask = inb(PIC1_DATA);
   // slave_mask = inb(PIC2_DATA);
   // mask the master
-  outb(0xFF, PIC1_DATA);
+  outb(master_mask, PIC1_DATA);
   // mask the slave
-  outb(0xFF, PIC2_DATA);
+  outb(slave_mask, PIC2_DATA);
 
   // starts initialization sequence in casade mode
   outb(ICW1, PIC1_COMMAND);
+  outb(ICW2_MASTER, PIC1_DATA);
+  outb(ICW3_MASTER, PIC1_DATA);
+  outb(ICW4, PIC1_DATA);
+
   outb(ICW1, PIC2_COMMAND);
+  outb(ICW2_SLAVE, PIC2_DATA);
+  outb(ICW3_SLAVE, PIC2_DATA);
+  outb(ICW4, PIC2_DATA);
 
-  outb(ICW2_MASTER, PIC1_COMMAND);
-  outb(ICW2_SLAVE, PIC2_COMMAND);
-
-  outb(ICW3_MASTER, PIC1_COMMAND);
-  outb(ICW3_SLAVE, PIC2_COMMAND);
-
-  outb(ICW4, PIC1_COMMAND);
-  outb(ICW4, PIC2_COMMAND);
+  outb(master_mask, PIC1_DATA);
+  // mask the slave
+  outb(slave_mask, PIC2_DATA);
 
 }
 
@@ -55,7 +57,7 @@ void enable_irq(uint32_t irq_num) {
     outb(slave_mask, PIC2_DATA);
   }
   else{
-    outb(master_mask, PIC2_DATA);
+    outb(master_mask, PIC1_DATA);
   }
 }
 
@@ -70,7 +72,7 @@ void disable_irq(uint32_t irq_num) {
     outb(slave_mask, PIC2_DATA);
   }
   else{
-    outb(master_mask, PIC2_DATA);
+    outb(master_mask, PIC1_DATA);
   }
 }
 

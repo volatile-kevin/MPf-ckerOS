@@ -1,0 +1,25 @@
+MP3 checkpoint 1 bugs:
+
+BUG 1:
+
+    description: infinite boot loop
+    how long?: 4 hours
+    fix: debug.sh was not getting executed and the wrong workdir was being used, thanks Benny
+    
+BUG 2: 
+
+    description: general protection fault
+    how long?: 3 hours
+    fix: had to fill all idt entries and PIC was not being initialized correctly
+    
+BUG 3: 
+
+    description: lgdt, lidt not working
+    how long?: 2 hours
+    fix: gdt_desc was declared inside of gdt:, _gdt:, skewing all the alignment
+    
+BUG 4: 
+
+    description: keyboard not outputting correct chars
+    how long?: 2 hours
+    fix: made sure that char array of scan codes to chars was being indexed correctly
