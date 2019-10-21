@@ -60,7 +60,7 @@ int page_test_null(){
 
     int result = PASS;
     uint32_t* temp = NULL;
-    *temp;
+    *temp = 3;
 
     return result;
 }
@@ -99,7 +99,7 @@ int page_test_deref_out(){
 
     int result = PASS;
     uint32_t* temp = (uint32_t* )0xFFFFFFF;
-    *temp;
+    *temp = 3;
 
     return result;
 }
@@ -119,7 +119,7 @@ int page_test_deref_in(){
 
     int result = PASS;
     uint32_t* temp = (uint32_t*)0x400005;
-    temp;
+    temp = NULL;
 
     return result;
 }
@@ -136,7 +136,7 @@ void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
 	// launch your tests here
 	//TEST_OUTPUT("page_test_null", page_test_null());
-	TEST_OUTPUT("page_test_video", page_test_video());
-	TEST_OUTPUT("page_test_deref_in", page_test_deref_in());
+	//TEST_OUTPUT("page_test_video", page_test_video());
+	//TEST_OUTPUT("page_test_deref_in", page_test_deref_in());
 	//TEST_OUTPUT("page_test_deref_out", page_test_deref_out());
 }

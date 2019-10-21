@@ -4,6 +4,7 @@
 #include "lib.h"
 #include "linkage.h"
 
+
 #define NUM_IDT_ENTRIES 47 // current number of entries in our IDT we have defined
 
 void de(){printf("ERROR 1\n"); while(1);} //divide error
@@ -91,7 +92,7 @@ void setup_idt_inplace(){
         SET_IDT_ENTRY(idt[37], gen_purp);
         SET_IDT_ENTRY(idt[38], gen_purp);
         SET_IDT_ENTRY(idt[39], gen_purp);
-        SET_IDT_ENTRY(idt[40], gen_purp);
+        SET_IDT_ENTRY(idt[40], rtc_asm);
         SET_IDT_ENTRY(idt[41], gen_purp);
         SET_IDT_ENTRY(idt[42], gen_purp);
         SET_IDT_ENTRY(idt[43], gen_purp);
