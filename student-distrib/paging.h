@@ -7,6 +7,7 @@
 #define ONE_KB 1024
 #define FOUR_KB 4096 //Default size of a page
 #define FOUR_MB 4194304 //Size of a big page
+#define VIDEO_MEM_INDEX 0xB8
 #define INITIAL_PAGEDIR_VAL 0x00000002
 #define INITIAL_PAGETABLE_ATTRIBUTE 0x2
 #define INITIAL_VIDEOMEM_ATTRIBUTE 0x3
@@ -15,7 +16,7 @@
 
 void init_paging(void);
 //void* get_physaddr(void* virtualaddr);
-void map_page(void* physaddr, void* virtualaddr, unsigned int flags);
+//void map_page(void* physaddr, void* virtualaddr, unsigned int flags);
 extern void flush_tlb(void);
 extern void enable_paging(unsigned long pagediraddress);
 

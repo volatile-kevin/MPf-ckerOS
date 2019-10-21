@@ -45,6 +45,84 @@ int idt_test(){
 	return result;
 }
 
+/* Paging Test NULL
+ *
+ * Tries to dereference null
+ *
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: init paging
+ * Files: page.c/h pageasm.S
+ */
+int page_test_null(){
+    TEST_HEADER;
+
+    int result = PASS;
+    uint32_t* temp = NULL;
+    *temp;
+
+    return result;
+}
+
+/* Paging Test video mem
+ *
+ * Tries to write to video memory
+ *
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: init paging
+ * Files: page.c/h pageasm.S
+ */
+int page_test_video(){
+    TEST_HEADER;
+
+    int result = PASS;
+    putc('*'); //putc writes to video memory
+
+    return result;
+}
+
+/* Paging Test dereference kernel address outside
+ *
+ * Tries to dereference an address outside the kernel
+ *
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: init paging
+ * Files: page.c/h pageasm.S
+ */
+int page_test_deref_out(){
+    TEST_HEADER;
+
+    int result = PASS;
+    uint32_t* temp = (uint32_t* )0xFFFFFFF;
+    *temp;
+
+    return result;
+}
+
+/* Paging Test dereference inside kernel
+ *
+ * Tries to dereference something from inside the kernel
+ *
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: init paging
+ * Files: page.c/h pageasm.S
+ */
+int page_test_deref_in(){
+    TEST_HEADER;
+
+    int result = PASS;
+    uint32_t* temp = (uint32_t*)0x400005;
+    temp;
+
+    return result;
+}
 // add more tests here
 
 /* Checkpoint 2 tests */
@@ -57,4 +135,8 @@ int idt_test(){
 void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
 	// launch your tests here
+	//TEST_OUTPUT("page_test_null", page_test_null());
+	TEST_OUTPUT("page_test_video", page_test_video());
+	TEST_OUTPUT("page_test_deref_in", page_test_deref_in());
+	//TEST_OUTPUT("page_test_deref_out", page_test_deref_out());
 }

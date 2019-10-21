@@ -32,7 +32,7 @@ void init_paging(void){
     }
     //This sets the entry in the page table for video memory
 
-    page_table[VIDEO_MEM/ONE_KB] = page_table[VIDEO_MEM/ONE_KB] | INITIAL_VIDEOMEM_ATTRIBUTE;
+    page_table[VIDEO_MEM_INDEX] |= 3;
 
 
     //Add the first page table to the page directory
@@ -66,35 +66,35 @@ void init_paging(void){
 //    }
 //}
 
-/**
- * map_page
- * ===========
- * param: the physical address, the virtual address to be converted, the flags
- * returns: The physical address
- * maps the virtual address to the physical address
- */
-void map_page(void* physaddr, void* virtualaddr, unsigned int flags){
-    // Make sure that both addresses are page-aligned.
-    if(!((unsigned long)physaddr%FOUR_KB) && !((unsigned long)virtualaddr%FOUR_KB)){
-        return;
-    }
-    unsigned long pdindex = (unsigned long)virtualaddr >> 22;
-    unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
-
-    unsigned long * pd = (unsigned long *)0xFFFFF000;
-    // Here you need to check whether the PD entry is present.
-    // When it is not present, you need to create a new empty PT and
-    // adjust the PDE accordingly.
-
-    unsigned long * pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
-    // Here you need to check whether the PT entry is present.
-    // When it is, then there is already a mapping present. What do you do now?
-
-    pt[ptindex] = ((unsigned long)physaddr) | (flags & 0xFFF) | 0x01; // Present
-
-    // Now you need to flush the entry in the TLB
-    // or you might not notice the change.
-    flush_tlb();
-}
+//**
+// * map_page
+// * ===========
+// * param: the physical address, the virtual address to be converted, the flags
+// * returns: The physical address
+// * maps the virtual address to the physical address
+// */
+//void map_page(void* physaddr, void* virtualaddr, unsigned int flags){
+//    // Make sure that both addresses are page-aligned.
+//    if(!((unsigned long)physaddr%FOUR_KB) && !((unsigned long)virtualaddr%FOUR_KB)){
+//        return;
+//    }
+//    unsigned long pdindex = (unsigned long)virtualaddr >> 22;
+//    unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
+//
+//    unsigned long * pd = (unsigned long *)0xFFFFF000;
+//    // Here you need to check whether the PD entry is present.
+//    // When it is not present, you need to create a new empty PT and
+//    // adjust the PDE accordingly.
+//
+//    unsigned long * pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
+//    // Here you need to check whether the PT entry is present.
+//    // When it is, then there is already a mapping present. What do you do now?
+//
+//    pt[ptindex] = ((unsigned long)physaddr) | (flags & 0xFFF) | 0x01; // Present
+//
+//    // Now you need to flush the entry in the TLB
+//    // or you might not notice the change.
+//    flush_tlb();
+//}
 
 
