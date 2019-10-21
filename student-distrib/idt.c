@@ -23,7 +23,7 @@ void mf(){printf("ERROR 17\n");while(1);return;} //x87 FPU error
 void ac(){printf("ERROR 18\n");while(1);return;} //alignment check ---> return zero
 void mc(){printf("ERROR 19\n");while(1);return;} //machine check
 void xf(){printf("ERROR 20\n");while(1);return;} //simd floating point exception
-
+void gen_purp(){printf("WACK\n");while(1);return;}
 // call our keyboard handler
 void keyboard(){
     printf("inside keyboard");
@@ -39,27 +39,16 @@ void setup_idt_inplace(){
     int i;
     printf("we got here");
 
-    for (i = 0; i < 20; i++){
+    for (i = 0; i < 47; i++){
         idt[i].seg_selector = KERNEL_CS;
         idt[i].dpl = 0;
         idt[i].reserved0 = 0;
         idt[i].reserved1 = 1;
         idt[i].reserved2 = 1;
         idt[i].reserved3 = 1;
-        idt[i].reserved4 = 0;
         idt[i].present = 1;
+        idt[i].size = 1;
     }
-
-    // static shit pointers[] = {de, db, nmi, bp, of, br, ud, nm, df, cpso, ts, np, ssf, gp, pf, ir, 
-//                         mf, ac, mc, xf};
-        idt[0x21].seg_selector = KERNEL_CS;
-        idt[0x21].dpl = 0;
-        idt[0x21].reserved0 = 0;
-        idt[0x21].reserved1 = 1;
-        idt[0x21].reserved2 = 1;
-        idt[0x21].reserved3 = 0;
-        idt[0x21].reserved4 = 0;
-        idt[0x21].present = 1;
 
         SET_IDT_ENTRY(idt[0], de);
         SET_IDT_ENTRY(idt[1], db);
@@ -81,7 +70,34 @@ void setup_idt_inplace(){
         SET_IDT_ENTRY(idt[17], ac);
         SET_IDT_ENTRY(idt[18], mc);
         SET_IDT_ENTRY(idt[19], xf);
+        SET_IDT_ENTRY(idt[20], gen_purp);
+        SET_IDT_ENTRY(idt[21], gen_purp);
+        SET_IDT_ENTRY(idt[22], gen_purp);
+        SET_IDT_ENTRY(idt[23], gen_purp);
+        SET_IDT_ENTRY(idt[24], gen_purp);
+        SET_IDT_ENTRY(idt[25], gen_purp);
+        SET_IDT_ENTRY(idt[26], gen_purp);
+        SET_IDT_ENTRY(idt[27], gen_purp);
+        SET_IDT_ENTRY(idt[28], gen_purp);
+        SET_IDT_ENTRY(idt[29], gen_purp);
+        SET_IDT_ENTRY(idt[30], gen_purp);
+        SET_IDT_ENTRY(idt[31], gen_purp);
+        SET_IDT_ENTRY(idt[32], gen_purp);
+        SET_IDT_ENTRY(idt[34], gen_purp);
+        SET_IDT_ENTRY(idt[35], gen_purp);
+        SET_IDT_ENTRY(idt[36], gen_purp);
+        SET_IDT_ENTRY(idt[37], gen_purp);
+        SET_IDT_ENTRY(idt[38], gen_purp);
+        SET_IDT_ENTRY(idt[39], gen_purp);
+        SET_IDT_ENTRY(idt[40], gen_purp);
+        SET_IDT_ENTRY(idt[41], gen_purp);
+        SET_IDT_ENTRY(idt[42], gen_purp);
         SET_IDT_ENTRY(idt[0x21], keyboard);
+        SET_IDT_ENTRY(idt[43], gen_purp);
+        SET_IDT_ENTRY(idt[44], gen_purp);
+        SET_IDT_ENTRY(idt[45], gen_purp);
+        SET_IDT_ENTRY(idt[46], gen_purp);
+        SET_IDT_ENTRY(idt[47], gen_purp);
 
         printf("we got to the bottom here");
 }
