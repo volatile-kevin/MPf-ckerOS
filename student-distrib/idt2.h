@@ -19,5 +19,6 @@ void ac();
 void mc();
 void xf();
 void keyboard();
+void gen_purp();
 
 void setup_idt_inplace();
