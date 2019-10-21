@@ -2,6 +2,9 @@
 #include "x86_desc.h"
 #include "keyboard.h"
 #include "lib.h"
+#include "linkage.h"
+
+#define NUM_IDT_ENTRIES 47 // current number of entries in our IDT we have defined
 
 void de(){printf("ERROR 1\n"); while(1);} //divide error
 void db(){printf("ERROR 2\n");while(1);return;} //reserved  (reserved)
@@ -24,22 +27,20 @@ void ac(){printf("ERROR 18\n");while(1);return;} //alignment check ---> return z
 void mc(){printf("ERROR 19\n");while(1);return;} //machine check
 void xf(){printf("ERROR 20\n");while(1);return;} //simd floating point exception
 void gen_purp(){printf("WACK\n");while(1);return;}
-// call our keyboard handler
-void keyboard(){
-    printf("inside keyboard");
-    // read keyboard data off port
-    // keyboard_data = inb(0x60);
-    keyboard_handler();
-    while (1);
-    return;
-} //divide error
 
-
+/* 
+ * setup_idt_inplace
+ *   DESCRIPTION: Sets up the IDT with the correct values associates them with their corresponding function
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: IDT is setup and ready for use
+ */
 void setup_idt_inplace(){
     int i;
-    printf("we got here");
 
-    for (i = 0; i < 47; i++){
+    // set each entry that we are concerned with, with the correct bit values
+    for (i = 0; i < NUM_IDT_ENTRIES; i++){
         idt[i].seg_selector = KERNEL_CS;
         idt[i].dpl = 0;
         idt[i].reserved0 = 0;
@@ -49,7 +50,7 @@ void setup_idt_inplace(){
         idt[i].present = 1;
         idt[i].size = 1;
     }
-
+        // associate the set values in IDT with the function that handles when the exception/interrupt is raised
         SET_IDT_ENTRY(idt[0], de);
         SET_IDT_ENTRY(idt[1], db);
         SET_IDT_ENTRY(idt[2], nmi);
@@ -83,6 +84,7 @@ void setup_idt_inplace(){
         SET_IDT_ENTRY(idt[30], gen_purp);
         SET_IDT_ENTRY(idt[31], gen_purp);
         SET_IDT_ENTRY(idt[32], gen_purp);
+        SET_IDT_ENTRY(idt[33], keyboard_asm);
         SET_IDT_ENTRY(idt[34], gen_purp);
         SET_IDT_ENTRY(idt[35], gen_purp);
         SET_IDT_ENTRY(idt[36], gen_purp);
@@ -92,12 +94,9 @@ void setup_idt_inplace(){
         SET_IDT_ENTRY(idt[40], gen_purp);
         SET_IDT_ENTRY(idt[41], gen_purp);
         SET_IDT_ENTRY(idt[42], gen_purp);
-        SET_IDT_ENTRY(idt[0x21], keyboard);
         SET_IDT_ENTRY(idt[43], gen_purp);
         SET_IDT_ENTRY(idt[44], gen_purp);
         SET_IDT_ENTRY(idt[45], gen_purp);
         SET_IDT_ENTRY(idt[46], gen_purp);
         SET_IDT_ENTRY(idt[47], gen_purp);
-
-        printf("we got to the bottom here");
 }
