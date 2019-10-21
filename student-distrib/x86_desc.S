@@ -32,7 +32,6 @@ _tss:
     .byte 0
     .endr
 tss_bottom:
-
     .align  16
 gdt:
 _gdt:
