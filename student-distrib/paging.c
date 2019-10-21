@@ -31,7 +31,8 @@ void init_paging(void){
         page_table[i] = (i*FOUR_KB) | INITIAL_PAGETABLE_ATTRIBUTE;
     }
     //This sets the entry in the page table for video memory
-    page_table[VIDEO_MEM] = page_table[VIDEO_MEM] | INITIAL_VIDEOMEM_ATTRIBUTE;
+
+    page_table[VIDEO_MEM/ONE_KB] = page_table[VIDEO_MEM/ONE_KB] | INITIAL_VIDEOMEM_ATTRIBUTE;
 
 
     //Add the first page table to the page directory
@@ -40,8 +41,8 @@ void init_paging(void){
     page_directory[1] = FOUR_MB | INITIAL_KERNEL_ATTRIBUTE;
 
 
-    //We have to use inline assembly for this part because we cannot access CR3 in C
-    enable_paging();
+    //We have to use inline assembly for this part because we cannot access CR3 or CR0 or CR4 in C
+    enable_paging(page_directory);
 }
 /**
  * get_physaddr

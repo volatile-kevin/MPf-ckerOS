@@ -17,7 +17,7 @@ void init_paging(void);
 //void* get_physaddr(void* virtualaddr);
 void map_page(void* physaddr, void* virtualaddr, unsigned int flags);
 extern void flush_tlb(void);
-extern void enable_paging(void);
+extern void enable_paging(unsigned long pagediraddress);
 
 ////Paging arrays
 extern uint32_t page_directory[ONE_KB] __attribute__((aligned(FOUR_KB)));

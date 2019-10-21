@@ -5,10 +5,15 @@ enable_paging:
     push %ebp
     movl %esp, %ebp
     push %eax
-    movl 8(%esp), %eax
+    movl 8(%ebp), %eax
     movl %eax, %cr3
+
+    movl %cr4, %eax
+    orl $0x00000090, %eax
+    movl %eax, %cr4
+
     movl %cr0, %eax
-    orl $0x80000000, %eax
+    orl $0x80000001, %eax
     movl %eax, %cr0
     pop %eax
     movl %ebp, %esp
