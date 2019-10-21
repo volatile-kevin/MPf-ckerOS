@@ -6,57 +6,60 @@
 #include "tests.h"
 #include "keyboard.h"
 
+#define NUM_CHARACTERS 0x3B
+#define KEYBOARD_PORT 0x60
 
-/*
-############### Ports:
-IO Port	Access Type	Purpose
-0x60	Read/Write	Data Port
-0x64	Read	Status Register
-0x64	Write	Command Register
+// array of characters, indicies map to scan codes on keyboard
+char char_array[NUM_CHARACTERS] = {'!', '!', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '!', '!',
+	 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '!', '!', 'a', 's',
+	 'd', 'f', 'g', 'h', 'j', 'k', 'l' , ';', '\'', '`', '!', '\\', 'z', 'x', 'c', 'v',
+	 'b', 'n', 'm',',', '.', '/', '!', '*', '!', ' ', '!'};
 
-Data Port:
-The Data Port (IO Port 0x60) is used for reading data that was received from a 
-PS/2 device or from the PS/2 controller itself and writing data to a PS/2 device 
-or to the PS/2 controller itself.
 
-############### Status Register:
-
-Bit	                    Meaning
-0	Output buffer status (0 = empty, 1 = full)
-(must be set before attempting to read data from IO port 0x60)
-
-1	Input buffer status (0 = empty, 1 = full)
-(must be clear before attempting to write data to IO port 0x60 or IO port 0x64)
-
-2	System Flag
-Meant to be cleared on reset and set by firmware (via. PS/2 Controller Configuration Byte) if the system passes self tests (POST)
-
-3	Command/data (0 = data written to input buffer is data for PS/2 device, 1 = data written to input buffer is data for PS/2 controller command)
-4	Unknown (chipset specific)
-May be "keyboard lock" (more likely unused on modern systems)
-
-5	Unknown (chipset specific)
-May be "receive time-out" or "second PS/2 port output buffer full"
-
-6	Time-out error (0 = no error, 1 = time-out error)
-7	Parity error (0 = no error, 1 = parity error)
-
-Command Register:
-The Command Port (IO Port 0x64) 
-is used for sending commands to the PS/2 Controller (not to PS/2 devices).
-
-*/
-
+/* 
+ * init_keyboard
+ *   DESCRIPTION: Initializes the keyboard for use.
+ *   INPUTS: none
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: keyboard is enabled on PIC
+ */
 void init_keyboard(){
-    // enable keyboard interrupt
+    // enable keyboard interrupt on the PIC
     enable_irq(1);
 }
 
-
+/* 
+ * keyboard_handler
+ *   DESCRIPTION: Takes input from keyboard and displays it
+ *   INPUTS: none (implicit inb() from the keyboard port)
+ *   OUTPUTS: none
+ *   RETURN VALUE: none
+ *   SIDE EFFECTS: keyboard typed value is read and put on screen
+ */
 void keyboard_handler(){
+    // clear interrupts
+    cli();
+
+    // initialize vars
     unsigned int val;
-    printf("NICENICENICENICENICENICE");
-//    val = inb(0x60);
-//    printf(val);
+    char output_to_display;
+
+    // get character from keyboard port
+    val = inb(KEYBOARD_PORT);
+
+    // if we are within our possible characters
+    if ((val > 0) & (val < NUM_CHARACTERS)){
+
+        output_to_display = char_array[val];
+        // if the character is valid, print it
+        if (output_to_display != '!'){
+            putc(output_to_display);
+        }
+    }
+    // restore interrupts
+    sti();
+    // send end of interrupt signal
+    send_eoi(1);
  }
 
