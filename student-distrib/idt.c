@@ -1,66 +1,87 @@
-#include "idt.h"
+#include "idt2.h"
 #include "x86_desc.h"
 #include "keyboard.h"
-//this code sets up an entry into the Interrupt Descriptor Table
-//your IDT must contain entries for exceptions, a few interrupts, system calls
+#include "lib.h"
 
-//		31....16     16 15   
-/*|Offset 31...16|P |DPL |0D110|000|    | */
-#define pointersSize 21
-
-unsigned long long * addr;
-
-//static pointers[pointersSize];
-typedef char (* const shit) (void);
-static shit pointers[] = {de, db, nmi, bp, of, br, ud, nm, df, cpso, ts, np, ssf, gp, pf, ir, 
-                        mf, ac, mc, xf, tc, keyboard};
-
-void fill_idt(unsigned long long * idt_addr){
-    addr = idt_addr;
-    unsigned i;
-    for (i = 0; i  < pointersSize; i++){
-        setup_idt(pointers[i], i);
-    }
-}
-
-
-void setup_idt(void* handler_address, int irq_num){
-    uint32_t idt_upper;
-    uint32_t idt_lower;
-    /* Set Offset 31:16 Present DPL */
-    idt_upper = ((unsigned long)handler_address & 0xffff0000) | (1 << 15) | (3 << 13) | 0x0E00; /* Size, other ‘1’ bits */
-    /* Segment Selector Offset 15:00 */
-    idt_lower = (KERNEL_CS << 16) | (unsigned long long)handler_address & 0xffff;
-    /* Fill in the entry in the IDT */
-    addr[irq_num] = ((unsigned long)(idt_upper) << 32) | idt_lower;
-}
-
-char de(){printf("ERROR\n");return 0;} //divide error
-char db(){printf("ERROR\n");return 0;} //reserved  (reserved)
-char nmi(){printf("ERROR\n");return 0;} //nonmaskable external interrupt
-char bp(){printf("ERROR\n");return 0;} //breakpoint
-char of(){printf("ERROR\n");return 0;} //overflow
-char br(){printf("ERROR\n");return 0;} //bound range exceeded
-char ud(){printf("ERROR\n");return 0;} //invalid opcode
-char nm(){printf("ERROR\n");return 0;} //device not available
-char df(){printf("ERROR\n");return 0;} //double fault --> return zero always
-char cpso(){printf("ERROR\n");return 0;} //coprocessor segment overrun (reserved)
-char ts(){printf("ERROR\n");return 0;} //invalid tss
-char np(){printf("ERROR\n");return 0;} //segment not present
-char ssf(){printf("ERROR\n");return 0;} //stack segment fault
-char gp(){printf("ERROR\n");return 0;} //general protection
-char pf(){printf("ERROR\n");return 0;} //page fault
-char ir(){printf("ERROR\n");return 0;} //intel reserved do not use
-char mf(){printf("ERROR\n");return 0;} //x87 FPU error
-char ac(){printf("ERROR\n");return 0;} //alignment check ---> return zero
-char mc(){printf("ERROR\n");return 0;} //machine check
-char xf(){printf("ERROR\n");return 0;} //simd floating point exception
-char tc(){printf("ERROR\n");return 0;} //timing chip
+void de(){printf("ERROR 1\n"); while(1);} //divide error
+void db(){printf("ERROR 2\n");while(1);return;} //reserved  (reserved)
+void nmi(){printf("ERROR 3\n");while(1);return;} //nonmaskable external interrupt
+void bp(){printf("ERROR 4\n");while(1);return;} //breakpoint
+void of(){printf("ERROR 5\n");while(1);return;} //overflow
+void br(){printf("ERROR 6\n");while(1);return;} //bound range exceeded
+void ud(){printf("ERROR 7\n");while(1);return;} //invalid opcode
+void nm(){printf("ERROR 8\n");while(1);return;} //device not available
+void df(){printf("ERROR 9\n");while(1);return;} //double fault --> return zero always
+void cpso(){printf("ERROR 10\n");while(1);return;} //coprocessor segment overrun (reserved)
+void ts(){printf("ERROR 11\n");while(1);return;} //invalid tss
+void np(){printf("ERROR 12\n");while(1);return;} //segment not present
+void ssf(){printf("ERROR 13\n");while(1);return;} //stack segment fault
+void gp(){printf("ERROR 14\n");while(1);return;} //general protection
+void pf(){printf("ERROR 15\n");while(1);return;} //page fault
+void ir(){printf("ERROR 16\n");while(1);return;} //intel reserved do not use
+void mf(){printf("ERROR 17\n");while(1);return;} //x87 FPU error
+void ac(){printf("ERROR 18\n");while(1);return;} //alignment check ---> return zero
+void mc(){printf("ERROR 19\n");while(1);return;} //machine check
+void xf(){printf("ERROR 20\n");while(1);return;} //simd floating point exception
 
 // call our keyboard handler
-char keyboard(){
-    unsigned int keyboard_data;
-    keyboard_data = inb(0x60);
-    keyboard_handler(keyboard_data);
-    return 0;
+void keyboard(){
+    printf("inside keyboard");
+    // read keyboard data off port
+    // keyboard_data = inb(0x60);
+    keyboard_handler();
+    while (1);
+    return;
 } //divide error
+
+
+void setup_idt_inplace(){
+    int i;
+    printf("we got here");
+
+    for (i = 0; i < 20; i++){
+        idt[i].seg_selector = KERNEL_CS;
+        idt[i].dpl = 0;
+        idt[i].reserved0 = 0;
+        idt[i].reserved1 = 1;
+        idt[i].reserved2 = 1;
+        idt[i].reserved3 = 1;
+        idt[i].reserved4 = 0;
+        idt[i].present = 1;
+    }
+
+    // static shit pointers[] = {de, db, nmi, bp, of, br, ud, nm, df, cpso, ts, np, ssf, gp, pf, ir, 
+//                         mf, ac, mc, xf};
+        idt[0x21].seg_selector = KERNEL_CS;
+        idt[0x21].dpl = 0;
+        idt[0x21].reserved0 = 0;
+        idt[0x21].reserved1 = 1;
+        idt[0x21].reserved2 = 1;
+        idt[0x21].reserved3 = 0;
+        idt[0x21].reserved4 = 0;
+        idt[0x21].present = 1;
+
+        SET_IDT_ENTRY(idt[0], de);
+        SET_IDT_ENTRY(idt[1], db);
+        SET_IDT_ENTRY(idt[2], nmi);
+        SET_IDT_ENTRY(idt[3], bp);
+        SET_IDT_ENTRY(idt[4], of);
+        SET_IDT_ENTRY(idt[5], br);
+        SET_IDT_ENTRY(idt[6], ud);
+        SET_IDT_ENTRY(idt[7], nm);
+        SET_IDT_ENTRY(idt[8], df);
+        SET_IDT_ENTRY(idt[9], cpso);
+        SET_IDT_ENTRY(idt[10], ts);
+        SET_IDT_ENTRY(idt[11], np);
+        SET_IDT_ENTRY(idt[12], ssf);
+        SET_IDT_ENTRY(idt[13], gp);
+        SET_IDT_ENTRY(idt[14], pf);
+        SET_IDT_ENTRY(idt[15], ir);
+        SET_IDT_ENTRY(idt[16], mf);
+        SET_IDT_ENTRY(idt[17], ac);
+        SET_IDT_ENTRY(idt[18], mc);
+        SET_IDT_ENTRY(idt[19], xf);
+        SET_IDT_ENTRY(idt[0x21], keyboard);
+
+        printf("we got to the bottom here");
+}

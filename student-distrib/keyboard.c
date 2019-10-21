@@ -53,10 +53,10 @@ void init_keyboard(){
 }
 
 
-void keyboard_handler(unsigned int kb_data){
-
-
-
-
+void keyboard_handler(){
+    unsigned int val;
+    printf("NICENICENICENICENICENICE");
+//    val = inb(0x60);
+//    printf(val);
  }
 

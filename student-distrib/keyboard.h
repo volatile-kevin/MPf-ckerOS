@@ -4,9 +4,9 @@
 #define STATUS_REGISTER 0x64
 
 // initialize keyboard for input
-int init_keyboard();
+void init_keyboard();
 
 // handle input and output for keyboard
-void keyboard_handler(unsigned int kb_data);
+void keyboard_handler();
 
 #endif // keyboard.h
