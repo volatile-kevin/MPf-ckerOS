@@ -36,7 +36,7 @@ void init_paging(void){
 
 
     //Add the first page table to the page directory
-    page_directory[0] = ((unsigned int)page_table) | INITIAL_PAGETABLE_ATTRIBUTE;
+    page_directory[0] = ((unsigned int)page_table) | INITIAL_PAGETABLE;
     //The second page is the page for the kernel. We map this to 4MB since the doc told us to
     page_directory[1] = FOUR_MB | INITIAL_KERNEL_ATTRIBUTE;
 

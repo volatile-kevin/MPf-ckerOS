@@ -14,7 +14,7 @@ enable_paging:
     movl %eax, %cr4
     #Set cr0 to enable paging
     movl %cr0, %eax
-    orl $0x00000001, %eax #setting the flag to enable paging
+    orl $0x80000000, %eax #setting the flag to enable paging
     movl %eax, %cr0
     pop %eax
     movl %ebp, %esp

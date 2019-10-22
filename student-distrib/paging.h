@@ -10,6 +10,7 @@
 #define VIDEO_MEM_INDEX 0xB8
 #define INITIAL_PAGEDIR_VAL 0x00000002
 #define INITIAL_PAGETABLE_ATTRIBUTE 0x2
+#define INITIAL_PAGETABLE 0x3
 #define INITIAL_VIDEOMEM_ATTRIBUTE 0x3
 #define INITIAL_KERNEL_ATTRIBUTE 0x83 //Sets the size to 1 so the page is 4MB
 #define VIDEO_MEM       0xB8000 //defined in lib.c

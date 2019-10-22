@@ -32,7 +32,7 @@ void rtc_handler(){
     // get rid of its data
     inb(RTC_CMD);
     //test
-    test_interrupts();
+//    test_interrupts();
 
     sti();
     //send the EOI

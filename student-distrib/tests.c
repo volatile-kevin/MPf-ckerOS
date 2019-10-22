@@ -133,9 +133,9 @@ int page_test_deref_in(){
 
 /* Test suite entry point */
 void launch_tests(){
-	TEST_OUTPUT("idt_test", idt_test());
+	//TEST_OUTPUT("idt_test", idt_test());
 	// launch your tests here
-	//TEST_OUTPUT("page_test_null", page_test_null());
+	TEST_OUTPUT("page_test_null", page_test_null());
 	//TEST_OUTPUT("page_test_video", page_test_video());
 	//TEST_OUTPUT("page_test_deref_in", page_test_deref_in());
 	//TEST_OUTPUT("page_test_deref_out", page_test_deref_out());
