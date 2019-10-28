@@ -216,6 +216,25 @@ void test_rtc_write(){
     }
 }
 
+void test_rtc_write2(){
+	int freq = 2;
+	int wait = 0;
+	while (freq <= 1024){
+		clear_kb();
+		rtc_write(freq);
+		printf("%d HZ", freq);
+		while (wait < freq*6){
+			putc("-");
+			rtc_read();
+			wait++;
+		}
+		wait = 0;
+		freq *= 2;
+
+	}
+
+}
+
 int terminal_write_works(){
 	TEST_HEADER;
 
@@ -303,7 +322,9 @@ void launch_tests(){
     for(i = 0; i < 10; i++){
         rtc_read();
     }
-
+	test_rtc_write2();
+	clear_kb();
+	rtc_close();
 	//TEST_OUTPUT("terminal_write_works", terminal_write_works());
 	//TEST_OUTPUT("terminal_read_works", terminal_read_works());
 
