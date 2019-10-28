@@ -34,7 +34,13 @@ BUG 1:
     
 BUG 2:
 
-    description: 
-    how long?: 
-    fix: 
+    description: Screen does not scroll when filling up the last line with text
+    how long?: 1 hour
+    fix: Making an edge case for when the cursor is at the very last spot in the screen.
+    
+BUG 3:
+
+    description: Scrolling the screen leaves the last line of text unchanged
+    how long?: 20 minutes
+    fix: Used part of our backspace algorithm to fill up the last line in video memory with spaces
     
