@@ -22,6 +22,12 @@ void clear(void) {
         *(uint8_t *)(video_mem + (i << 1)) = ' ';
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
+	reset_screenx_screeny();
+}
+
+void reset_screenx_screeny(void){
+	screen_x = 0;
+	screen_y = 0;
 }
 
 /* Standard printf().
@@ -470,7 +476,7 @@ int8_t* strncpy(int8_t* dest, const int8_t* src, uint32_t n) {
  * Function: increments video memory. To be used to test rtc */
 void test_interrupts(void) {
     int32_t i;
-    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-        video_mem[i << 1]++;
+    for (i = 0; i < NUM_ROWS*NUM_COLS; i++) {
+        video_mem[i*2 + 1]+=8;
     }
 }

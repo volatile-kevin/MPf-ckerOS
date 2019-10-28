@@ -1,6 +1,8 @@
 #include "tests.h"
 #include "x86_desc.h"
 #include "lib.h"
+#include "filesys.h"
+#include "rtc.h"
 
 #define PASS 1
 #define FAIL 0
@@ -21,7 +23,7 @@ static inline void assertion_failure(){
 /* Checkpoint 1 tests */
 
 /* IDT Test - Example
- * 
+ *
  * Asserts that first 10 IDT entries are not NULL
  * Inputs: None
  * Outputs: PASS/FAIL
@@ -35,7 +37,7 @@ int idt_test(){
 	int i;
 	int result = PASS;
 	for (i = 0; i < 10; ++i){
-		if ((idt[i].offset_15_00 == NULL) && 
+		if ((idt[i].offset_15_00 == NULL) &&
 			(idt[i].offset_31_16 == NULL)){
 			assertion_failure();
 			result = FAIL;
@@ -126,6 +128,88 @@ int page_test_deref_in(){
 // add more tests here
 
 /* Checkpoint 2 tests */
+// read_file_test
+// print the stuff inside of a file, read by name
+void read_file_test(){
+	int32_t fd = 2;
+	int32_t nbytes = 10000;
+	uint8_t buf[10000];
+	int i;
+	clear();
+	i = file_open((uint8_t*)"syserr");
+	i = file_read(fd, buf, nbytes);
+
+	unsigned j = 0;
+	for(; j < 10000; j++){
+		putc(buf[j]);
+	}
+}
+
+
+/*list_files
+ * lists the files in the current directory
+ *
+ */
+void list_files(){
+	int i = 0;
+	uint8_t str[32];
+	int retval;
+	// dentry_t dentry;
+	printf("Printing files in current directory...\n");
+	for (; i < 16; i++){
+		retval = dir_read((uint8_t*)&str);
+		printf("file %d: %s\n",i, str);
+		rtc_read();
+	}
+	return;
+}
+
+void test_rtc_write(){
+	uint32_t freq = 2;
+	int i = 0;
+	int count = 0;
+	while (count < 10){
+		// clear();
+		rtc_write(freq);
+		// printf("RATE: %d HZ", freq);
+
+		while (i < freq*freq){
+			rtc_read();
+			if(i % 2 == 0){
+				int32_t fd = 0;
+				int32_t nbytes = 1024;
+				uint8_t buf[1024];
+				int i;
+				clear();
+				i = file_open((uint8_t*)"frame0.txt");
+				i = file_read(fd, buf, nbytes);
+
+				unsigned j = 0;
+				for(; j < 1024; j++){
+					putc(buf[j]);
+				}
+			}
+			else{
+				int32_t fd = 0;
+				int32_t nbytes = 1024;
+				uint8_t buf[1024];
+				int i;
+				clear();
+				i = file_open((uint8_t*)"frame1.txt");
+				i = file_read(fd, buf, nbytes);
+
+				unsigned j = 0;
+				for(; j < 1024; j++){
+					putc(buf[j]);
+				}
+			}
+			i++;
+		}
+		i = 0;
+		count++;
+		// freq <<= 1;
+	}
+}
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
 /* Checkpoint 5 tests */
@@ -135,7 +219,18 @@ int page_test_deref_in(){
 void launch_tests(){
 	//TEST_OUTPUT("idt_test", idt_test());
 	// launch your tests here
-	TEST_OUTPUT("page_test_null", page_test_null());
+	clear();
+	list_files();
+	int i;
+	for(i = 0; i < 10; i++){
+		rtc_read();
+	}
+	test_rtc_write();
+	for(i = 0; i < 10; i++){
+		rtc_read();
+	}
+	read_file_test();
+	//TEST_OUTPUT("page_test_null", page_test_null());
 	//TEST_OUTPUT("page_test_video", page_test_video());
 	//TEST_OUTPUT("page_test_deref_in", page_test_deref_in());
 	//TEST_OUTPUT("page_test_deref_out", page_test_deref_out());
