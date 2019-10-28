@@ -140,7 +140,7 @@ void read_file_test(){
     int32_t nbytes = 10000;
     uint8_t buf[10000];
     int i;
-    clear();
+    clear_kb();
     i = file_open((uint8_t*)"syserr");
     i = file_read(fd, buf, nbytes);
 
@@ -173,7 +173,7 @@ void test_rtc_write(){
     int i = 0;
     int count = 0;
     while (count < 10){
-        // clear();
+        // clear_kb();
         rtc_write(freq);
         // printf("RATE: %d HZ", freq);
 
@@ -184,7 +184,7 @@ void test_rtc_write(){
                 int32_t nbytes = 1024;
                 uint8_t buf[1024];
                 int i;
-                clear();
+                clear_kb();
                 i = file_open((uint8_t*)"frame0.txt");
                 i = file_read(fd, buf, nbytes);
 
@@ -198,7 +198,7 @@ void test_rtc_write(){
                 int32_t nbytes = 1024;
                 uint8_t buf[1024];
                 int i;
-                clear();
+                clear_kb();
                 i = file_open((uint8_t*)"frame1.txt");
                 i = file_read(fd, buf, nbytes);
 
@@ -288,7 +288,7 @@ void launch_tests(){
 	//TEST_OUTPUT("page_test_deref_out", page_test_deref_out());
 
 	// -----------------------------CHECKPOINT 2 TESTS-------------------------------
-    clear();
+    clear_kb();
     list_files();
     int i;
     for(i = 0; i < 10; i++){
@@ -300,7 +300,7 @@ void launch_tests(){
     }
     read_file_test();
 
-	TEST_OUTPUT("terminal_write_works", terminal_write_works());
-	TEST_OUTPUT("terminal_read_works", terminal_read_works());
+	//TEST_OUTPUT("terminal_write_works", terminal_write_works());
+	//TEST_OUTPUT("terminal_read_works", terminal_read_works());
 
 }
