@@ -14,9 +14,12 @@
 #include "keyboard.h"
 #include "idt2.h"
 #include "rtc.h"
+#include "filesys.h"
 
 
 #define RUN_TESTS
+
+uint32_t* modStartTemp;
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -59,6 +62,7 @@ void entry(unsigned long magic, unsigned long addr) {
         int mod_count = 0;
         int i;
         module_t* mod = (module_t*)mbi->mods_addr;
+        modStartTemp = (uint32_t*)mod->mod_start;
         while (mod_count < mbi->mods_count) {
             printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_start);
             printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_end);
@@ -146,8 +150,8 @@ void entry(unsigned long magic, unsigned long addr) {
     /* Init the PIC */
      setup_idt_inplace();
     i8259_init();
-    init_rtc();
-
+    // init_rtc();
+    rtc_open();
     /* Initialize devices, memory, filesystem, enable device interrupts on the
 
      * PIC, any other initialization stuff... */
@@ -163,7 +167,32 @@ void entry(unsigned long magic, unsigned long addr) {
      * without showing you any output */
     //printf("Enabling Interrupts\n");
     sti();
-    
+
+    filesys_init(modStartTemp);
+    // int32_t fd = 0;
+    // int32_t nbytes = 1024;
+    // uint8_t buf[1024];
+    // int i;
+    // clear();
+    // i = file_open("frame0.txt");
+    // i = file_read(fd, buf, nbytes);
+    //
+    // unsigned j = 0;
+    // for(; j < 1024; j++){
+    //   putc(buf[j]);
+    // }
+    /*
+	dentry_t dentry;
+     int32_t i = read_dentry_by_name("verylargetextwithverylongname.tx",&dentry);
+    int32_t i = read_dentry_by_name("verylargetextwithverylongname.txt", &dentry);
+
+	uint32_t word[32];
+	i = dir_read(&word);
+	printf("filenameaksfjls: %s\n", word);
+
+    printf("%d \n", i);
+    printf("filename: %s", dentry.name);*/
+    // clear();
 #ifdef RUN_TESTS
     /* Run tests */
      launch_tests();
