@@ -37,5 +37,7 @@ char rtc_read();
 */
 void rtc_write(unsigned int freq);
 
+/*this kills the rtc*/
+void rtc_close();
 
 
