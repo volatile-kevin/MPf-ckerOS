@@ -23,3 +23,18 @@ BUG 4:
     description: keyboard not outputting correct chars
     how long?: 2 hours
     fix: made sure that char array of scan codes to chars was being indexed correctly
+/*********************************************************************************************************************************************************************/
+MP3 checkpoint 2 bugs:
+
+BUG 1:
+
+    description: only capturing one data block
+    how long?: 1 hour
+    fix: incrementing our data block pointer in the wrong way
+    
+BUG 2:
+
+    description: 
+    how long?: 
+    fix: 
+    
