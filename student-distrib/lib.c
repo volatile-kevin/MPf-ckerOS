@@ -7,6 +7,10 @@
 #define NUM_COLS    80
 #define NUM_ROWS    25
 #define ATTRIB      0x7
+#define INIT_PORT   0x3D4
+#define DATA_PORT   0x3D5
+#define GET_UPPER_8 8
+#define GET_8_BITS 0xFF
 
 static int screen_x;
 static int screen_y;
@@ -22,12 +26,61 @@ void clear(void) {
         *(uint8_t *)(video_mem + (i << 1)) = ' ';
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
-	reset_screenx_screeny();
+    update_cursor(screen_x, screen_y);
+
+}
+/* void clear_kb(void);
+ * Inputs: void
+ * Return Value: none
+ * Function: Clears video memory and resets the pointer*/
+void clear_kb(void) {
+    int32_t i;
+    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+        *(uint8_t *)(video_mem + (i << 1)) = ' ';
+        *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+    }
+    screen_x = 0;
+    screen_y = 0;
+    update_cursor(screen_x, screen_y);
+}
+/* void backspace(void);
+ * Inputs: void
+ * Return Value: none
+ * Function: Clears section of video memory */
+void backspace(void) {
+    // clear the last space we were at in memory
+    *(uint8_t *)(VIDEO + ((NUM_COLS * screen_y + screen_x-1) << 1)) = ' ';
+    *(uint8_t *)(VIDEO + (((NUM_COLS * screen_y + screen_x-1) << 1)) + 1) = ATTRIB;
+    // move the current x back 1
+    if(screen_x){
+        screen_x--;
+    }
+    // if we are at far left, reset x to right side and decrement y
+    else if(screen_y){
+        screen_x = NUM_COLS-1;
+        screen_y--;
+    }
+    update_cursor(screen_x, screen_y);
 }
 
-void reset_screenx_screeny(void){
-	screen_x = 0;
-	screen_y = 0;
+/* void update_cursor(void);
+ * Inputs: int x - x location
+ *         int y - y location
+ * Return Value: none
+ * Function: Updates the location of the cursor
+ */
+void update_cursor(int x, int y)
+{
+    // get current position
+    uint16_t pos = y * NUM_COLS + x;
+
+    // write the new cursor location to update to
+    outb(0x0F, INIT_PORT);
+    outb((uint8_t) (pos & GET_8_BITS), DATA_PORT);
+
+    outb(0x0E, INIT_PORT);
+    outb((uint8_t) ((pos >> GET_UPPER_8) & GET_8_BITS), DATA_PORT );
+
 }
 
 /* Standard printf().
@@ -174,16 +227,37 @@ int32_t puts(int8_t* s) {
  * Return Value: void
  *  Function: Output a character to the console */
 void putc(uint8_t c) {
-    if(c == '\n' || c == '\r') {
-        screen_y++;
+    if (c == '\n' || c == '\r') {
+        // if we are at the bottom of the screen
+        if (screen_y == NUM_ROWS - 1) {
+            // move up the screen
+            memmove((void *) VIDEO, (void *) (VIDEO + (NUM_COLS << 1)), (NUM_COLS * (NUM_ROWS - 1)) << 1);
+            int i;
+            // write empty to the bottom row (since we just moved it up)
+            for (i = 0; i < NUM_COLS; i++) {
+                *(uint8_t *) (VIDEO + ((NUM_COLS * screen_y + i) << 1)) = ' ';
+                *(uint8_t *) (VIDEO + (((NUM_COLS * screen_y + i) << 1)) + 1) = ATTRIB;
+            }
+        } else {
+            // just go to next line
+            screen_y++;
+        }
         screen_x = 0;
-    } else {
+    } else if(screen_y == NUM_ROWS-1 && screen_x == NUM_COLS-1){
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
-        screen_x %= NUM_COLS;
+        putc('\n');
+    }else {
+        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
+        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
+        screen_x++;
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+        screen_x %= NUM_COLS;
     }
+    // update cursor when we are finished
+    update_cursor(screen_x, screen_y);
+
 }
 
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
@@ -476,7 +550,10 @@ int8_t* strncpy(int8_t* dest, const int8_t* src, uint32_t n) {
  * Function: increments video memory. To be used to test rtc */
 void test_interrupts(void) {
     int32_t i;
-    for (i = 0; i < NUM_ROWS*NUM_COLS; i++) {
-        video_mem[i*2 + 1]+=8;
+    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+        video_mem[i << 1]++;
     }
 }
+
+
+
