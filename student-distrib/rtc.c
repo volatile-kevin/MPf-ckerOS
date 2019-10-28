@@ -89,7 +89,7 @@ void rtc_write(unsigned int input_freq){
 		else if (rate > RTC_RATE_MAX)
 			rate = RTC_RATE_MAX; //also cant be more than 15 
 	}
-//	printf("RATE1: %d\n", rate);
+	//printf("RATE1: %d\n", rate);
 
 	rate &= 0x0F; //ensure it is less than 16
 	outb(NMI | 0xA, RTC_DATA); //set index to register A, disable NMI

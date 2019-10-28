@@ -222,9 +222,9 @@ void test_rtc_write2(){
 	while (freq <= 1024){
 		clear_kb();
 		rtc_write(freq);
-		printf("%d HZ", freq);
+		printf("%d HZ R", freq);
 		while (wait < freq*6){
-			putc("-");
+			putc('E');
 			rtc_read();
 			wait++;
 		}
