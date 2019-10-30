@@ -72,6 +72,9 @@ int dir_read(uint8_t * fname){
 		strncpy((int8_t*)fname, (int8_t*)dentry.name, MAXFILENAMESIZE);
 		curfile++;
 	}
+  // inode_t* inodeBlock = (inode_t*)(start_addr) + dentry.inodeNum + 1;
+
+  // printf("size: %d \n", inodeBlock->length);
 	return retval;
 }
 
@@ -174,7 +177,7 @@ int dir_open(const uint8_t* filename){
    dataBlock_t* currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
    //uint32_t length = inodeBlock->length;
    unsigned i = 0;
-
+   // printf("size: %d \n", inodeBlock->length);
    // keep copying until length is 0
    while(length != 0){
      currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
