@@ -20,10 +20,13 @@
 int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
 
     // if buffer size less than nbytes set max to that, otherwise set to nbytes
-    int max = BUFFER_SIZE < nbytes ? BUFFER_SIZE : nbytes;
-    // move that data into internal buffer from our kb buffer
-    memmove(buf, &buf_kb,max);
-    return max;
+    if(buf){
+        int max = BUFFER_SIZE < nbytes ? BUFFER_SIZE : nbytes;
+        // move that data into internal buffer from our kb buffer
+        memmove(buf, &buf_kb,max);
+        return max;
+    }
+    return 0;
 }
 
 /* 
@@ -41,11 +44,14 @@ int32_t terminal_write (int32_t fd, const void* buf, int32_t nbytes){
     int count = 0;
 
     // putc up to nbytes in the buf
+    if(buf){
     for(i = 0; i < nbytes; i++){
         putc((*(uint8_t *)((uint32_t)buf + i)));
         count = count + 1;
     }
     return count;
+    }
+    return -1;
 }
 
 /* 
