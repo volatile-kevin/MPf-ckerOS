@@ -177,9 +177,11 @@ int dir_open(const uint8_t* filename){
    dataBlock_t* currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
    //uint32_t length = inodeBlock->length;
    unsigned i = 0;
-   // printf("size: %d \n", inodeBlock->length);
+   uint32_t eofLength = inodeBlock->length;
+   uint32_t eofCount = 0;
+
    // keep copying until length is 0
-   while(length != 0){
+   while(length != 0 || eofLength > eofCount){
      currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
      currDataBlock = (dataBlock_t*)(currDataBlock) + inodeBlock->dataBlockNums[i];
      uint32_t currLength = 0;//current amount you can copy from a block of data
@@ -206,6 +208,7 @@ int dir_open(const uint8_t* filename){
        memcpy((void*)buf,(void*)currDataBlock, currLength);
      }
      length -= currLength;
+     eofCount += currLength;
      buf += currLength;
      i++;
    }
