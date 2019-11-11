@@ -6,6 +6,7 @@
 #include "pcb.h"
 #include "x86_desc.h"
 #include "paging.h"
+#include "execute.h"
 
 #define NUMPROCESS 6
 #define PIDOFF 2
@@ -27,6 +28,13 @@ int32_t halt(uint8_t status){
             break;
     }
     int curr_pcb = i;
+    if(curr_pcb == 0){
+      // return -1;
+      PCB_array[curr_pcb].state = -1;
+      PCB_array[curr_pcb].pcb_in_use = -1;
+
+      execute("shell");
+    }
     // destruct FDT
     for (i = 0; i < NUMPROCESS; i++){
         PCB_array[curr_pcb].fd_table[i].file_pos = -1;
@@ -60,6 +68,8 @@ int32_t halt(uint8_t status){
     int parent_pid = PCB_array[curr_pcb].parent_pid;
      PCB_array[parent_pid].state = 0;
      PCB_array[curr_pcb].parent_pid = -1;
+
+
 
     // update the tss
     tss.ss0 = PCB_array[curr_pcb].ss0;
