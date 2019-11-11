@@ -7,7 +7,7 @@
 // written output buffer
 // The last byte is for 0 which is why there is a + 1
 char buf_kb[BUFFER_SIZE];
-
+char enter_flag;
 
 // initialize keyboard for input
 void init_keyboard();

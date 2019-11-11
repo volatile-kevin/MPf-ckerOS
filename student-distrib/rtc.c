@@ -11,20 +11,20 @@
 #define RTC_RATE_MIN 4 //1024 hz is our maximum frequency
 
 unsigned int rate; //file scope variable to keep track of current rate
-volatile uint8_t waiting = 0; //variable that keeps track of if the rtc is blocked
+uint8_t waiting = 0; //variable that keeps track of if the rtc is blocked
 
 
 /*init_rtc()
  * Initialize the rtc to interrupt at 1024 Hz
- * output data to the
+ * output data to the 
  */
 void init_rtc(){
     outb(NMI | 0xB, RTC_DATA);            // select register B, and disable NMI
     char prev = inb(RTC_CMD);	    // read the current value of register B
     outb(NMI | 0xB, RTC_DATA);	    // set the index again (a read will reset the index to register D)
-    outb((prev | REGBIT), RTC_CMD); // write the previous value ORed with 0x40. This turns on bit 6 of register B
+    outb((prev | REGBIT), RTC_CMD); // write the previous value ORed with 0x40. This turns on bit 6 of register B 
 
-    enable_irq(IRQ_RTC); //tell the PIC to enable this interrupt
+    enable_irq(IRQ_RTC); //tell the PIC to enable this interrupt 
 }
 
 /*rtc_handler()
@@ -45,29 +45,38 @@ void rtc_handler(){
     //send the EOI
     send_eoi(IRQ_RTC);
 	waiting = 0;
-
+   
 }
 
 /*rtc_open()
 *  Initialize the rtc and set it to a default rate of 2 Hz
 */
-void rtc_open(){
+int32_t rtc_open(const uint8_t* filename){
+	(void) filename;
+
 	unsigned int freq = 2; //start at 2 Hz
 	init_rtc();
-	rtc_write(freq);
+	rtc_write(freq, 0, 0);
+	return 0;
 }
 
 /*rtc_close()
  * close the rtc
- */
-void rtc_close(){
-	rtc_write(0);
+ */ 
+int32_t rtc_close(int32_t fd){
+	(void) fd;
+	rtc_write(0, 0, 0);
+	return 0;
 }
 
 /* rtc_read()
  * block until the next interrupt
  */
-char rtc_read(){
+int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes){
+	(void) fd;
+	(void) buf;
+	(void) nbytes;
+
 	waiting = 1; //flag variable to keep track of waiting
 	while (waiting);
 	return 0;
@@ -76,7 +85,12 @@ char rtc_read(){
 /* rtc_write()
  * sets the frequency, must be a multiple of 2 [2,8192]
  */
-void rtc_write(unsigned int input_freq){
+int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
+	(void) buf;
+	(void) nbytes;
+	int32_t input_freq;
+	input_freq = fd;
+
 	rate = 0; //reset rate
 
 	if (input_freq){ //if input freq is not 0, 0 disables interrupt
@@ -87,7 +101,7 @@ void rtc_write(unsigned int input_freq){
 		if (rate < RTC_RATE_MIN)
 			rate = RTC_RATE_MIN; //rate cant be less than 4 ( 1024 Hz)
 		else if (rate > RTC_RATE_MAX)
-			rate = RTC_RATE_MAX; //also cant be more than 15
+			rate = RTC_RATE_MAX; //also cant be more than 15 
 	}
 	//printf("RATE1: %d\n", rate);
 
@@ -96,4 +110,7 @@ void rtc_write(unsigned int input_freq){
 	char prev = inb(RTC_CMD);
 	outb(0x8A, RTC_DATA); //set index to register A, disable NMI
 	outb(((prev & 0xF0) | rate), RTC_CMD); // write the rate to RTC
+	return 0;
 }
+
+

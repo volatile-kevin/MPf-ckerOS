@@ -1,6 +1,7 @@
 #include "types.h"
 #include "i8259.h"
 #include "lib.h"
+#include "types.h"
 
 /*init_rtc()
  * Initialize the rtc to interrupt at 1024 Hz
@@ -18,26 +19,26 @@ void rtc_handler();
 * @param: none
 * @return 0 for success, -1 for failure
 */
-void rtc_open();
+
+// int32_t (*open)(const uint8_t* filename);
+int32_t rtc_open(const uint8_t* filename);
 
 /**rtc_close
 * return 0, can be used for virtualization
 *
 */
-void rtc_close();
+int32_t rtc_close(int32_t fd);
 
 /**rtc_read
 * function to block (wait) until the next RTC interrupt
 * hmm idk how we will do this, lets see
 */
-char rtc_read();
+int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes);
 
 /**rtc_write
 * change the frequency, must be a multiple of 2
 */
-void rtc_write(unsigned int freq);
+int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes);
 
-/*this kills the rtc*/
-void rtc_close();
 
 

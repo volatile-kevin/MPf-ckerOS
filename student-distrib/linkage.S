@@ -1,7 +1,8 @@
 .globl rtc_asm
 .globl keyboard_asm
 
- # 
+
+ #
  #      keyboard_asm
  #   DESCRIPTION: Linkage that stores register values before calling our c function
  #   INPUTS: none
@@ -17,7 +18,7 @@ keyboard_asm:
     iret
 
 
- # 
+ #
  #      rtc_asm
  #   DESCRIPTION: Linkage that stores register values before calling our c function
  #   INPUTS: none

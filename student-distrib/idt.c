@@ -3,8 +3,9 @@
 #include "keyboard.h"
 #include "lib.h"
 #include "linkage.h"
+#include "syscall_asm.h"
 
-
+#define SYSCALL_NUM 128 // 0x80
 #define NUM_IDT_ENTRIES 47 // current number of entries in our IDT we have defined
 
 void de(){printf("ERROR 1\n"); while(1);} //divide error
@@ -29,7 +30,23 @@ void mc(){printf("ERROR 19\n");while(1);return;} //machine check
 void xf(){printf("ERROR 20\n");while(1);return;} //simd floating point exception
 void gen_purp(){printf("WACK\n");while(1);return;}
 
-/* 
+void set_entry(int i){
+    idt[i].seg_selector = KERNEL_CS;
+    idt[i].dpl = 0;
+    idt[i].reserved0 = 0;
+    idt[i].reserved1 = 1;
+    idt[i].reserved2 = 1;
+    idt[i].reserved3 = 1;
+    idt[i].present = 1;
+    idt[i].size = 1;
+
+    if (i == SYSCALL_NUM){
+      idt[i].dpl = 3;
+    }
+}
+
+
+/*
  * setup_idt_inplace
  *   DESCRIPTION: Sets up the IDT with the correct values associates them with their corresponding function
  *   INPUTS: none
@@ -40,17 +57,12 @@ void gen_purp(){printf("WACK\n");while(1);return;}
 void setup_idt_inplace(){
     int i;
 
-    // set each entry that we are concerned with, with the correct bit values
-    for (i = 0; i < NUM_IDT_ENTRIES; i++){
-        idt[i].seg_selector = KERNEL_CS;
-        idt[i].dpl = 0;
-        idt[i].reserved0 = 0;
-        idt[i].reserved1 = 1;
-        idt[i].reserved2 = 1;
-        idt[i].reserved3 = 1;
-        idt[i].present = 1;
-        idt[i].size = 1;
-    }
+  // set each entry that we are concerned with, with the correct bit values
+  for (i = 0; i < NUM_IDT_ENTRIES; i++){
+    set_entry(i);
+	}
+	set_entry(SYSCALL_NUM);//set system call handler
+
         // associate the set values in IDT with the function that handles when the exception/interrupt is raised
         SET_IDT_ENTRY(idt[0], de);
         SET_IDT_ENTRY(idt[1], db);
@@ -100,4 +112,5 @@ void setup_idt_inplace(){
         SET_IDT_ENTRY(idt[45], gen_purp);
         SET_IDT_ENTRY(idt[46], gen_purp);
         SET_IDT_ENTRY(idt[47], gen_purp);
+		    SET_IDT_ENTRY(idt[0x80], syscall_handler_asm);
 }

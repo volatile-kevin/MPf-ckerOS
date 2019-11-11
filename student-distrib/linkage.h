@@ -10,3 +10,4 @@ extern void keyboard_asm();
 
 //calls our rtc handler and saves reggies
 extern void rtc_asm();
+extern void sys_call_asm();

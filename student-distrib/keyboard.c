@@ -61,7 +61,7 @@ char char_array_noshift_cap[NUM_CHARACTERS] = {0, 0, '1', '2', '3', '4', '5', '6
 // l-shift, r-shift, ctrl, caps-lock
 int flag_arr[NUMFLAGS] = {0, 0, 0, 0};
 
-/* 
+/*
  * init_keyboard
  *   DESCRIPTION: Initializes the keyboard for use.
  *   INPUTS: none
@@ -73,7 +73,7 @@ void init_keyboard(){
     // enable keyboard interrupt on the PIC
     enable_irq(IRQ_KB); //1 is the keyboard port on the pic
     buf_kb[MAXCHAR] = 0; //Set the last character in the buffer to 0
-
+		enter_flag = 1;
     //Enable the cursor
     // outb(0x0A, 0x3D4);
     // outb((inb(0x3D5) & 0xC0) | 0, 0x3D5);
@@ -82,7 +82,7 @@ void init_keyboard(){
     // outb((inb(0x3D5) & 0xE0) | 1, 0x3D5);
 }
 
-/* 
+/*
  * keyboard_handler
  *   DESCRIPTION: Takes input from keyboard and displays it
  *   INPUTS: none (implicit inb() from the keyboard port)
@@ -146,7 +146,7 @@ void keyboard_handler(){
         default:
             break;
     }
-    
+
     // clear the screen
     // CLEARING THE SCREEN ALSO CLEARS THE BUFFER DONT @ ME
     if (flag_arr[CTRLIDX] && scanCode == L_SCANCODE){
@@ -172,9 +172,9 @@ void keyboard_handler(){
         buf_kb[curr_idx] = '\n';
         // ******************** Call terminal read *********************
         putc('\n');
+				enter_flag = 0;
         curr_idx = 0;
         num_chars = 0;
-        memset(&buf_kb, 0, BUFFER_SIZE);
     }
 
 // l-shift, r-shift, l-ctrl, r-ctrl, caps-lock, enter
@@ -240,4 +240,3 @@ void keyboard_handler(){
     // send end of interrupt signal
     send_eoi(IRQ_KB);
  }
-

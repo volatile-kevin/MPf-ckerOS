@@ -15,6 +15,7 @@
 #include "idt2.h"
 #include "rtc.h"
 #include "filesys.h"
+#include "pcb.h"
 
 
 #define RUN_TESTS
@@ -151,7 +152,7 @@ void entry(unsigned long magic, unsigned long addr) {
      setup_idt_inplace();
     i8259_init();
     // init_rtc();
-    rtc_open();
+    rtc_open((const uint8_t*) " ");
     /* Initialize devices, memory, filesystem, enable device interrupts on the
 
      * PIC, any other initialization stuff... */
@@ -169,6 +170,7 @@ void entry(unsigned long magic, unsigned long addr) {
     sti();
 
     filesys_init(modStartTemp);
+    pcb_filesys_init(modStartTemp);
     // int32_t fd = 0;
     // int32_t nbytes = 1024;
     // uint8_t buf[1024];

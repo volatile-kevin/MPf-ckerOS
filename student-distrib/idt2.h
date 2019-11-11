@@ -22,3 +22,6 @@ void keyboard();
 void gen_purp();
 
 void setup_idt_inplace();
+void set_entry(int i);
+
+

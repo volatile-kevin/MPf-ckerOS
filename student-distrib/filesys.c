@@ -3,7 +3,7 @@
 #include "lib.h"
 #include "tests.h"
 #include "types.h"
-
+#include "pcb.h"
 
 #define INODES_OFFSET 1
 #define NUMBLOCKS_OFFSET 2
@@ -19,8 +19,9 @@ uint32_t numdentries;
 uint32_t numinodes;
 uint32_t numblocks;
 dentry_t* startdentry;
-dentry_t currDentry;
 uint32_t curfile = 1;
+file_desc_t* fdt[8];
+dentry_t currDentry;
 
 // this function initializes the file filesystem
 // it reads the boot block and fills global variables with the boot block meta data
@@ -37,9 +38,10 @@ void filesys_init(uint32_t* mod_start){
 // this function reads a file by calling read_data
 // its parameters get passed into read_data, and the offset param for read_data is 0 for now
 // MUST CALL FILE_OPEN BEFORE CALLING THIS
-int file_read(int32_t fd, void* buf, int32_t nbytes){
-  int32_t retval = read_data(currDentry.inodeNum, 0, buf, nbytes);
-  return retval;
+int32_t file_read (int32_t fd, void* buf, int32_t nbytes) {
+  int32_t bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
+  // PCB.PCB_member[fd_avail].file_pos +=
+  return bytes_copied;
 }
 
 // do nothing for now cp2
@@ -63,7 +65,12 @@ int file_open(const uint8_t* filename){
 // this function uses read_dentry_by_index in order to get all files in a directory
 // for now, it acts as an "ls"
 // we use strncpy to get the names of all the files
-int dir_read(uint8_t * fname){
+int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
+  (void) fd;
+  (void) nbytes;
+  uint8_t* fname;
+  fname = (uint8_t*) buf;
+
 	dentry_t dentry;
 	int32_t retval = read_dentry_by_index(curfile,&dentry);
 	if (!retval){
@@ -72,9 +79,6 @@ int dir_read(uint8_t * fname){
 		strncpy((int8_t*)fname, (int8_t*)dentry.name, MAXFILENAMESIZE);
 		curfile++;
 	}
-  // inode_t* inodeBlock = (inode_t*)(start_addr) + dentry.inodeNum + 1;
-
-  // printf("size: %d \n", inodeBlock->length);
 	return retval;
 }
 
@@ -162,7 +166,7 @@ int dir_open(const uint8_t* filename){
    // use inode struct to access data blocks that hold file information
    // loop through the file data and put it into a buffer
    // until length in B is reached
-
+   uint32_t saveLength = length;
    // fail
    if(inode > numinodes || inode < 0){
      return -1;
@@ -181,7 +185,7 @@ int dir_open(const uint8_t* filename){
    uint32_t eofCount = 0;
 
    // keep copying until length is 0
-   while(length != 0 || eofLength > eofCount){
+   while(length != 0 && eofLength > eofCount){
      currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
      currDataBlock = (dataBlock_t*)(currDataBlock) + inodeBlock->dataBlockNums[i];
      uint32_t currLength = 0;//current amount you can copy from a block of data
@@ -213,5 +217,10 @@ int dir_open(const uint8_t* filename){
      i++;
    }
 
-   return 0;
+   if(saveLength < eofCount){
+     return saveLength;
+   }
+   else{
+     return eofCount;
+   }
  }

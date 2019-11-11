@@ -15,5 +15,4 @@ extern int32_t terminal_open (const uint8_t* filename);
 // clears any terminal specific variables (or do nothing), return 0
 extern int32_t terminal_close (int32_t fd);
 
-
 #endif // keyboard.h

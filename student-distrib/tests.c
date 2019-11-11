@@ -5,7 +5,8 @@
 #include "terminal.h"
 #include "filesys.h"
 #include "rtc.h"
-
+#include "execute.h"
+#include "pcb.h"
 #define PASS 1
 #define FAIL 0
 #define BUF_SIZE 3
@@ -28,7 +29,7 @@ static inline void assertion_failure(){
 /* Checkpoint 1 tests */
 
 /* IDT Test - Example
- * 
+ *
  * Asserts that first 10 IDT entries are not NULL
  * Inputs: None
  * Outputs: PASS/FAIL
@@ -42,7 +43,7 @@ int idt_test(){
 	int i;
 	int result = PASS;
 	for (i = 0; i < 10; ++i){
-		if ((idt[i].offset_15_00 == NULL) && 
+		if ((idt[i].offset_15_00 == NULL) &&
 			(idt[i].offset_31_16 == NULL)){
 			assertion_failure();
 			result = FAIL;
@@ -155,85 +156,85 @@ void read_file_test(){
  * lists the files in the current directory
  *
  */
-void list_files(){
-    int i = 0;
-    uint8_t str[32];
-    int retval;
-    // dentry_t dentry;
-    printf("Printing files in current directory...\n");
-    for (; i < 16; i++){
-        retval = dir_read((uint8_t*)&str);
-        printf("file %d: %s\n",i, str);
-        rtc_read();
-    }
-    return;
-}
+// void list_files(){
+//     int i = 0;
+//     uint8_t str[32];
+//     int retval;
+//     // dentry_t dentry;
+//     printf("Printing files in current directory...\n");
+//     for (; i < 16; i++){
+//         retval = dir_read((uint8_t*)&str);
+//         printf("file %d: %s\n",i, str);
+//         rtc_read();
+//     }
+//     return;
+// }
 
-void test_rtc_write(){
-    uint32_t freq = 2;
-    int i = 0;
-    int count = 0;
-    while (count < 10){
-        // clear_kb();
-        rtc_write(freq);
-        // printf("RATE: %d HZ", freq);
+// void test_rtc_write(){
+//     uint32_t freq = 2;
+//     int i = 0;
+//     int count = 0;
+//     while (count < 10){
+//         // clear_kb();
+//         rtc_write(freq);
+//         // printf("RATE: %d HZ", freq);
 
-        while (i < freq*freq){
-            rtc_read();
-            if(i % 2 == 0){
-                int32_t fd = 0;
-                int32_t nbytes = 1024;
-                uint8_t buf[1024];
-                int i;
-                clear_kb();
-                i = file_open((uint8_t*)"frame0.txt");
-                i = file_read(fd, buf, nbytes);
+//         while (i < freq*freq){
+//             rtc_read();
+//             if(i % 2 == 0){
+//                 int32_t fd = 0;
+//                 int32_t nbytes = 1024;
+//                 uint8_t buf[1024];
+//                 int i;
+//                 clear_kb();
+//                 i = file_open((uint8_t*)"frame0.txt");
+//                 i = file_read(fd, buf, nbytes);
 
-                unsigned j = 0;
-                for(; j < 1024; j++){
-                    putc(buf[j]);
-                }
-            }
-            else{
-                int32_t fd = 0;
-                int32_t nbytes = 1024;
-                uint8_t buf[1024];
-                int i;
-                clear_kb();
-                i = file_open((uint8_t*)"frame1.txt");
-                i = file_read(fd, buf, nbytes);
+//                 unsigned j = 0;
+//                 for(; j < 1024; j++){
+//                     putc(buf[j]);
+//                 }
+//             }
+//             else{
+//                 int32_t fd = 0;
+//                 int32_t nbytes = 1024;
+//                 uint8_t buf[1024];
+//                 int i;
+//                 clear_kb();
+//                 i = file_open((uint8_t*)"frame1.txt");
+//                 i = file_read(fd, buf, nbytes);
 
-                unsigned j = 0;
-                for(; j < 1024; j++){
-                    putc(buf[j]);
-                }
-            }
-            i++;
-        }
-        i = 0;
-        count++;
-        // freq <<= 1;
-    }
-}
+//                 unsigned j = 0;
+//                 for(; j < 1024; j++){
+//                     putc(buf[j]);
+//                 }
+//             }
+//             i++;
+//         }
+//         i = 0;
+//         count++;
+//         // freq <<= 1;
+//     }
+// }
 
-void test_rtc_write2(){
-	int freq = 2;
-	int wait = 0;
-	while (freq <= 1024){
-		clear_kb();
-		rtc_write(freq);
-		printf("%d HZ R", freq);
-		while (wait < freq*6){
-			putc('E');
-			rtc_read();
-			wait++;
-		}
-		wait = 0;
-		freq *= 2;
+// void test_rtc_write2(){
+// 	int freq = 2;
+// 	int wait = 0;
+// 	while (freq <= 1024){
+// 		clear_kb();
+// 		rtc_write(freq);
+// 		printf("%d HZ R", freq);
+// 		while (wait < freq*6){
+// 			putc('E');
+// 			rtc_read();
+// 			wait++;
+// 		}
+// 		wait = 0;
+// 		freq *= 2;
 
-	}
+// 	}
 
-}
+// }
 
 int terminal_write_works(){
 	TEST_HEADER;
@@ -279,7 +280,7 @@ int terminal_read_works(){
 		result = PASS;
 	}
 
-	memset(&buf_kb, 0, BUFFER_SIZE);	
+	memset(&buf_kb, 0, BUFFER_SIZE);
 
 	return result;
 }
@@ -308,23 +309,30 @@ void launch_tests(){
 	//TEST_OUTPUT("page_test_deref_out", page_test_deref_out());
 
 	// -----------------------------CHECKPOINT 2 TESTS-------------------------------
-    clear_kb();
-    list_files();
-    int i;
-    for(i = 0; i < 10; i++){
-        rtc_read();
-    }
-    test_rtc_write();
-    for(i = 0; i < 10; i++){
-        rtc_read();
-    }
-    read_file_test();
-    for(i = 0; i < 10; i++){
-        rtc_read();
-    }
-	test_rtc_write2();
-	clear_kb();
-	rtc_close();
+  //   clear_kb();
+  //   list_files();
+  //   int i;
+  //   for(i = 0; i < 10; i++){
+  //       rtc_read();
+  //   }
+  //   test_rtc_write();
+  //   for(i = 0; i < 10; i++){
+  //       rtc_read();
+  //   }
+  //   read_file_test();
+  //   for(i = 0; i < 10; i++){
+  //       rtc_read();
+  //   }
+	// test_rtc_write2();
+	// clear_kb();
+	// rtc_close(" ");
+	// -----------------------------CHECKPOINT 3 TESTS-------------------------------
+	int i = 0;
+	// map_page();
+	// must initialize the PCB struct
+	init_PCB();
+	// start the shell
+	i = execute((uint8_t*)"shell");
 	//TEST_OUTPUT("terminal_write_works", terminal_write_works());
 	//TEST_OUTPUT("terminal_read_works", terminal_read_works());
 

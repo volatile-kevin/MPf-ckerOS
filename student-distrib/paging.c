@@ -38,7 +38,7 @@ void init_paging(void){
     //Add the first page table to the page directory
     page_directory[0] = ((unsigned int)page_table) | INITIAL_PAGETABLE;
     //The second page is the page for the kernel. We map this to 4MB since the doc told us to
-    page_directory[1] = FOUR_MB | INITIAL_KERNEL_ATTRIBUTE;
+    page_directory[1] = FOUR_MB | 0x87; //INITIAL_KERNEL_ATTRIBUTE
 
 
     //We have to use inline assembly for this part because we cannot access CR3 or CR0 or CR4 in C
@@ -66,35 +66,46 @@ void init_paging(void){
 //    }
 //}
 
-//**
+ //**
 // * map_page
 // * ===========
 // * param: the physical address, the virtual address to be converted, the flags
 // * returns: The physical address
 // * maps the virtual address to the physical address
 // */
-//void map_page(void* physaddr, void* virtualaddr, unsigned int flags){
-//    // Make sure that both addresses are page-aligned.
-//    if(!((unsigned long)physaddr%FOUR_KB) && !((unsigned long)virtualaddr%FOUR_KB)){
-//        return;
-//    }
-//    unsigned long pdindex = (unsigned long)virtualaddr >> 22;
-//    unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
-//
-//    unsigned long * pd = (unsigned long *)0xFFFFF000;
-//    // Here you need to check whether the PD entry is present.
-//    // When it is not present, you need to create a new empty PT and
-//    // adjust the PDE accordingly.
-//
-//    unsigned long * pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
-//    // Here you need to check whether the PT entry is present.
-//    // When it is, then there is already a mapping present. What do you do now?
-//
-//    pt[ptindex] = ((unsigned long)physaddr) | (flags & 0xFFF) | 0x01; // Present
-//
-//    // Now you need to flush the entry in the TLB
-//    // or you might not notice the change.
-//    flush_tlb();
-//}
+void map_page(void* physaddr, void* virtualaddr, unsigned int flags){
+   // Make sure that both addresses are page-aligned.
+   if((unsigned long)physaddr%FOUR_KB){
+//       printf("poo poo SANITY CHECK pee pee \n");
+       return;
+   }
+   if ((unsigned long)virtualaddr%FOUR_KB){
+//     printf("pee pee SANITY CHECK poo poo \n");
+     return;
+   }
 
+   // unsigned long pdindex = (unsigned long)virtualaddr >> 22;
+   // unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
 
+   // unsigned long * pd = (unsigned long *)0xFFFFF000;
+   // Here you need to check whether the PD entry is present.
+   // When it is not present, you need to create a new empty PT and
+   // adjust the PDE accordingly.
+
+   // unsigned long * pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
+   // Here you need to check whether the PT entry is present.
+   // When it is, then there is already a mapping present. What do you do now?
+   if (page_directory[(unsigned long)virtualaddr / FOUR_MB])
+   {
+     // printf("page present \n");
+     // printf("Index: %d\n", (unsigned long)virtualaddr / FOUR_MB);
+      page_directory[(unsigned long)virtualaddr / FOUR_MB] = (unsigned long)physaddr | flags;
+   }
+  //pt[ptindex] = ((unsigned long)physaddr) | (flags & 0xFFF) | 0x01; // Present
+  else
+   page_directory[(unsigned long)virtualaddr / FOUR_MB] = (unsigned long)physaddr | 0x87;
+
+   // Now you need to flush the entry in the TLB
+   // or you might not notice the change.
+   flush_tlb();
+}
