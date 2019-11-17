@@ -70,15 +70,18 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
   (void) nbytes;
   uint8_t* fname;
   fname = (uint8_t*) buf;
-
+  int i;
+  for(i = 0; i < 33; i++){
+    fname[i] = 0;
+  }
 	dentry_t dentry;
 	int32_t retval = read_dentry_by_index(curfile,&dentry);
-	if (!retval){
+	// if (!retval){
 		//uint8_t str[32] = dentry.name;
 		// str[31] = '\0';
 		strncpy((int8_t*)fname, (int8_t*)dentry.name, MAXFILENAMESIZE);
 		curfile++;
-	}
+
 	return retval;
 }
 

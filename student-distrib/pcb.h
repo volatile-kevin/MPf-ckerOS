@@ -71,7 +71,6 @@ void init_PCB();
 
 extern int insert_FDT_entry(uint8_t process_id, unsigned inodeNum, unsigned filePosition, unsigned flags);
 
-void remove_PCB_entry();
-
+void remove_fd_entry(int fd);
 
 #endif

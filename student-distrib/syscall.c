@@ -35,7 +35,7 @@ int32_t sys_read (int32_t fd, void* buf, int32_t nbytes){
       return 0;
     }
     else{
-      return bytescounter;
+      return 32;
     }
 }
 // write syscall wrapper
