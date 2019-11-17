@@ -107,21 +107,26 @@ syscall_close:
  #
 
 syscall_handler_asm:
-    cmp $1, %eax
-    je syscall_halt
-    cmp $2, %eax
-    je syscall_execute
-    cmp $3, %eax
-    je syscall_read
-    cmp $4, %eax
-    je syscall_write
-    cmp $5, %eax
-    je syscall_open
-    cmp $6, %eax
-    je syscall_close
+    # cmp $1, %eax
+    # je syscall_halt
+    # cmp $2, %eax
+    # je syscall_execute
+    # cmp $3, %eax
+    # je syscall_read
+    # cmp $4, %eax
+    # je syscall_write
+    # cmp $5, %eax
+    # je syscall_open
+    # cmp $6, %eax
+    # je syscall_close
+    subl $1, %eax
+    jmp *jump_table(,%eax,4)
 
 fail:
     # shouldn't get here
     call syscall_handler
     # popal
     iret
+
+jump_table:
+  .long syscall_halt, syscall_execute, syscall_read, syscall_write, syscall_open, syscall_close
