@@ -123,7 +123,8 @@ int insert_fdt(const uint8_t* filename){
   int i = file_open(filename);
   int j;
   int currPid, currFD;
-  dentry_t* currDentry;
+  dentry_t dent;
+  dentry_t* currDentry = &dent;
 
   // find active PCB
   for(j = 0; j < NUMPCBS; j++){
@@ -156,8 +157,16 @@ int insert_fdt(const uint8_t* filename){
       PCB_array[currPid].fd_table[currFD].jump_start_idx = &file_struct;
       break;
   }
-  return 0;
+  return currFD;
 }
 
-void remove_PCB_entry(){
+void remove_fd_entry(int fd){
+  int j;
+  int currPid;
+  for(j = 0; j < NUMPCBS; j++){
+    if(PCB_array[j].state == 0){
+      currPid = j;
+    }
+  }
+  PCB_array[currPid].fd_table[fd].flags_arr[0] = -1;
 }

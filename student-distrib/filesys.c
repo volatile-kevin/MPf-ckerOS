@@ -149,7 +149,7 @@ int dir_open(const uint8_t* filename){
    dentry->fileType = dentryptr->fileType;
    dentry->inodeNum = dentryptr->inodeNum;
 
-   return 0;
+   return 32;
  }
 
  /* inode points to data

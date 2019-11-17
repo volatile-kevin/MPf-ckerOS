@@ -107,32 +107,32 @@ void keyboard_handler(){
     switch(scanCode){
         case LSHIFT_DOWN: // left-shift pressed
             flag_arr[LSHIFTIDX] = ENABLED;
-            sti();
+            // sti();
             send_eoi(IRQ_KB);
             return;
         case LSHIFT_UP: // left-shift released
             flag_arr[LSHIFTIDX] = DISABLED;
-            sti();
+            // sti();
             send_eoi(IRQ_KB);
             return;
         case RSHIFT_DOWN: // right-shift pressed
             flag_arr[RSHIFTIDX] = ENABLED;
-            sti();
+            // sti();
             send_eoi(IRQ_KB);
             return;
         case RSHIFT_UP: // right-shift released
             flag_arr[RSHIFTIDX] = DISABLED;
-            sti();
+            // sti();
             send_eoi(IRQ_KB);
             return;
         case CTRL_DOWN: // control pressed
             flag_arr[CTRLIDX] ++;
-            sti();
+            // sti();
             send_eoi(IRQ_KB);
             return;
         case CTRL_UP: // control released
             flag_arr[CTRLIDX] --;
-            sti();
+            // sti();
             send_eoi(IRQ_KB);
             return;
         case CAPS_DOWN: // caps-lock pressed
@@ -140,7 +140,7 @@ void keyboard_handler(){
                 flag_arr[CAPSIDX] = DISABLED;
             else
                 flag_arr[CAPSIDX] = ENABLED;
-            sti();
+            // sti();
             send_eoi(IRQ_KB);
             return;
         default:
@@ -236,7 +236,7 @@ void keyboard_handler(){
         // A scancode that we do not currently support, its bad and should feel bad
     }
     // restore interrupts
-    sti();
+    // sti();
     // send end of interrupt signal
     send_eoi(IRQ_KB);
  }

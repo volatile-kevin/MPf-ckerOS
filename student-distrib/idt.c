@@ -36,12 +36,13 @@ void set_entry(int i){
     idt[i].reserved0 = 0;
     idt[i].reserved1 = 1;
     idt[i].reserved2 = 1;
-    idt[i].reserved3 = 1;
+    idt[i].reserved3 = 0;
     idt[i].present = 1;
     idt[i].size = 1;
 
     if (i == SYSCALL_NUM){
       idt[i].dpl = 3;
+      idt[i].reserved3 = 1;
     }
 }
 
