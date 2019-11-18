@@ -16,7 +16,7 @@
 #include "rtc.h"
 #include "filesys.h"
 #include "pcb.h"
-
+#include "execute.h"
 
 #define RUN_TESTS
 
@@ -197,10 +197,11 @@ void entry(unsigned long magic, unsigned long addr) {
     // clear();
 #ifdef RUN_TESTS
     /* Run tests */
-     launch_tests();
+//     launch_tests();
 #endif
     /* Execute the first program ("shell") ... */
-
+    init_PCB();
+    execute((uint8_t*)"shell");
     /* Spin (nicely, so we don't chew up cycles) */
     asm volatile (".1: hlt; jmp .1;");
 }

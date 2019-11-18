@@ -5,6 +5,7 @@
 #include "filesys.h"
 #include "pcb.h"
 #include "halt.h"
+#include "paging.h"
 
 #define NUMPCBS 6
 
@@ -67,6 +68,11 @@ int32_t sys_open (const uint8_t* filename){
 int32_t sys_close (int32_t fd){
     remove_fd_entry(fd);
     return 0;
+}
+
+//Maps a page in the user program to the video memory in physical memory
+int32_t sys_vidmap(uint8_t** screen_start){
+    return vid_map(screen_start);
 }
 
 // error handler

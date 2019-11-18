@@ -5,6 +5,8 @@
 //For now we will use static arrays. Will try to add dynamic memory allocation later
 uint32_t page_directory[ONE_KB] __attribute__((aligned(FOUR_KB)));
 uint32_t page_table[ONE_KB] __attribute__((aligned(FOUR_KB)));
+uint32_t user_video_page_table[ONE_KB] __attribute__((aligned(FOUR_KB)));
+
 
 /**
  * init_paging
@@ -109,3 +111,12 @@ void map_page(void* physaddr, void* virtualaddr, unsigned int flags){
    // or you might not notice the change.
    flush_tlb();
 }
+//We use the user page table to map the spot in virtual memory to the physical memory
+int32_t vid_map(uint8_t** screen_start){
+    page_directory[USER_MAP_LOC/FOUR_MB] =(unsigned int) user_video_page_table | 7; // User level permissions, 4kb page, r/w, present
+    user_video_page_table[0] = (unsigned int) screen_start | 7; // User level permissions, 4kb page, r/w, present
+    *screen_start = (uint8_t*)USER_MAP_LOC;
+    flush_tlb();
+    return (int32_t)*screen_start;
+}
+

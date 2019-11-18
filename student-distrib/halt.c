@@ -33,7 +33,7 @@ int32_t halt(uint8_t status){
       // PCB_array[curr_pcb].state = -1;
       // PCB_array[curr_pcb].pcb_in_use = -1;
       while(1){
-        execute("shell");
+        execute((uint8_t*)"shell");
       }
     }
     // destruct FDT

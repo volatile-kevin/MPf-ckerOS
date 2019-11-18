@@ -96,6 +96,15 @@ syscall_close:
 
     iret
 
+syscall_getargs:
+    iret
+
+syscall_vidmap:
+    pushl %ebx
+    call sys_vidmap
+    popl %ebx
+
+    iret
 
  #
  #   syscall_handler_asm
@@ -129,4 +138,4 @@ fail:
     iret
 
 jump_table:
-  .long syscall_halt, syscall_execute, syscall_read, syscall_write, syscall_open, syscall_close
+  .long syscall_halt, syscall_execute, syscall_read, syscall_write, syscall_open, syscall_close, syscall_getargs, syscall_vidmap
