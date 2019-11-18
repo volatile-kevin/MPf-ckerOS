@@ -22,7 +22,7 @@ dentry_t* startdentry;
 uint32_t curfile = 1;
 file_desc_t* fdt[8];
 dentry_t currDentry;
-
+int bytescounter = 0;
 // this function initializes the file filesystem
 // it reads the boot block and fills global variables with the boot block meta data
 // the only param is the address of the bootblock in memory and is void
@@ -81,8 +81,15 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
 		// str[31] = '\0';
 		strncpy((int8_t*)fname, (int8_t*)dentry.name, MAXFILENAMESIZE);
 		curfile++;
-
-	return retval;
+    bytescounter += retval;
+    if(bytescounter >= 512){
+      bytescounter = 0;
+      curfile = 0;
+      return 0;
+    }
+    else{
+      return 32;
+    }
 }
 
 // do nothing for now cp2

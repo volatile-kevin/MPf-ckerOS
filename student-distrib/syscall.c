@@ -11,7 +11,6 @@
 
 int currPid;
 int currFD;
-int bytescounter = 0;
 // halt syscall wrapper
 // returns whatever it calls returns
 int32_t sys_halt (uint8_t status){
@@ -29,14 +28,8 @@ int32_t sys_read (int32_t fd, void* buf, int32_t nbytes){
       return terminal_read(fd, buf, nbytes);
     }
     else{
-      bytescounter += PCB_array[currPid].fd_table[currFD].jump_start_idx->read(fd, buf, nbytes);
+      return PCB_array[currPid].fd_table[currFD].jump_start_idx->read(fd, buf, nbytes);
       // return (PCB_array[currPid].fd_table[fd].jump_start_idx)
-    }
-    if(bytescounter >= 512){
-      return 0;
-    }
-    else{
-      return 32;
     }
 }
 // write syscall wrapper
