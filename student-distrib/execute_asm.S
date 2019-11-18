@@ -13,13 +13,14 @@ switch_to_usr:
   movw %ax, %fs
   movw %ax, %gs
 
-  movl %esp, %eax
+  # movl %esp, %eax
   pushl $0x2B # USER_DS
-  pushl %eax
+  # pushl %eax
+  pushl $0x83FFFFC
   pushfl # push flags
-  popl %eax         # pop the flags and mask them with 0x200, then put them back on the stack
-  orl $0x200, %eax
-  pushl %eax
+  popl %edx         # pop the flags and mask them with 0x200, then put them back on the stack
+  orl $0x200, %edx
+  pushl %edx
   pushl $0x23 # USER_CS
   pushl 8(%ebp) # push the entrypoint (parameter)
   iret

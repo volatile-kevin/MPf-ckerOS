@@ -18,7 +18,7 @@
 #define KERNELSTACK 0x800000
 #define EIGHTKB 0x2000
 #define KSTACKOFFSET 4
-
+#define MAXCOMMANDSIZE 128
 uint32_t firstInstruct; //entrypoint of program img
 PCB_struct PCB_array[NUMPROCESSES]; //array of PCBs, maximum processes for this cp is 6
 
@@ -67,6 +67,8 @@ int load(const uint8_t* fname, uint8_t* buf, int32_t fd){
 // side effect: will go to userspace through context switch. Child processes will return to label before return
 int execute(const uint8_t* fname){
   // copy into this buffer
+  uint8_t temp[MAXCOMMANDSIZE];
+  memmove(temp, fname, MAXCOMMANDSIZE);
   uint8_t buf[HEADERBUFSIZE];
 
   int fd_avail = -1;
@@ -139,7 +141,8 @@ int execute(const uint8_t* fname){
     return -1;
   }
   // load the file contents into virtual memory
-  load(fname, (uint8_t*)VADDRPROGIMG, fd_avail);
+  // printf("%s \n", fnameSave);
+  load(temp, (uint8_t*)VADDRPROGIMG, fd_avail);
 
 
   // fill tss

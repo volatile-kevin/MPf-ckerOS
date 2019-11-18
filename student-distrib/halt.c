@@ -9,6 +9,7 @@
 #include "execute.h"
 
 #define NUMPROCESS 6
+#define FDTSIZE 8
 #define PIDOFF 2
 #define VADDR 0x08000000
 #define PFLAGS 0x87
@@ -30,14 +31,14 @@ int32_t halt(uint8_t status){
     int curr_pcb = i;
     if(curr_pcb == 0){
       // return -1;
-      // PCB_array[curr_pcb].state = -1;
-      // PCB_array[curr_pcb].pcb_in_use = -1;
+       PCB_array[curr_pcb].state = -1;
+       PCB_array[curr_pcb].pcb_in_use = -1;
       while(1){
         execute((uint8_t*)"shell");
       }
     }
     // destruct FDT
-    for (i = 0; i < NUMPROCESS; i++){
+    for (i = 2; i < FDTSIZE; i++){
         PCB_array[curr_pcb].fd_table[i].file_pos = -1;
         PCB_array[curr_pcb].fd_table[i].fileType = -1;
         PCB_array[curr_pcb].fd_table[i].flags_arr[0] = -1;
