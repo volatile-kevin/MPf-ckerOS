@@ -52,11 +52,11 @@ int read_ELF(const uint8_t* fname, uint8_t* buf, int32_t fd){
 // parameters: filename, ptr to buffer, file descriptor
 // returns: bytes copied
 // side effect: filesys uses a higherbound of size of file for nbytes, MAXBYTES will likely never be hit
-int load(const uint8_t* fname, uint8_t* buf, int32_t fd){
+int load(const uint8_t* fname, uint8_t* buf){
   int i;
   int nbytes = MAXBYTES;
   i = file_open(fname);
-  i = file_read(fd, buf, nbytes);
+  i = file_load(buf, nbytes);
   return i;
 }
 
@@ -118,9 +118,7 @@ int execute(const uint8_t* fname){
   // set active
   PCB_array[pid].state = 0;
 
-  // find first fd
-  fd_avail = get_fdAvail(pid);
-  PCB_array[pid].fd_table[fd_avail].flags_arr[0] = -1;
+
   // allocate a page
   map_page((void*)((pid + PIDOFFSET)*FOUR_MB), (void*)VADDRPROGPAGE, USWFLAGS);
   // map_page((fd_avail)*FOUR_MB, 0x08048000, 0x83);
@@ -142,7 +140,7 @@ int execute(const uint8_t* fname){
   }
   // load the file contents into virtual memory
   // printf("%s \n", fnameSave);
-  load(temp, (uint8_t*)VADDRPROGIMG, fd_avail);
+  load(temp, (uint8_t*)VADDRPROGIMG);
 
 
   // fill tss

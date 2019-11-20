@@ -36,6 +36,12 @@ void filesys_init(uint32_t* mod_start){
   curfile = 1;
 }
 
+int32_t file_load (void* buf, int32_t nbytes) {
+  int32_t bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
+  // PCB.PCB_member[fd_avail].file_pos +=
+  return bytes_copied;
+}
+
 // this function reads a file by calling read_data
 // its parameters get passed into read_data, and the offset param for read_data is 0 for now
 // MUST CALL FILE_OPEN BEFORE CALLING THIS
@@ -214,10 +220,7 @@ int dir_open(const uint8_t* filename){
    //uint32_t length = inodeBlock->length;
    uint32_t eofLength = inodeBlock->length;
    /*********************************************************************/
-   if (eofLength <= offset){
-     globalI = 0;
-     return 0;
-   }
+
 
    /*********************************************************************/
 
@@ -270,7 +273,11 @@ int dir_open(const uint8_t* filename){
      i++;
      /*********************************************************************/
    }
-   return eofCount;
+   if (eofLength <= offset){
+     globalI = 0;
+     return 0;
+   }
+   return eofCount - offset;
 
    // if(saveLength < eofCount){
    //   return saveLength;

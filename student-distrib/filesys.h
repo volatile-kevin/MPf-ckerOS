@@ -35,7 +35,7 @@ extern dentry_t currDentry;
 
 void filesys_init(uint32_t* mod_start);
 
-
+extern int32_t file_load (void* buf, int32_t nbytes);
 // int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes)
 extern int32_t file_read (int32_t fd, void* buf, int32_t nbytes);
 extern int file_write();
