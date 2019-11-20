@@ -72,12 +72,12 @@ void init_PCB(){
         PCB_array[j].process_id = j;
         PCB_array[j].state = -1;
         //stdin members
-        PCB_array[j].fd_table[0].jump_start_idx = (void*)12;
+        PCB_array[j].fd_table[0].jump_start_idx = &terminal_struct;
         PCB_array[j].fd_table[0].file_pos = 0;
         PCB_array[j].fd_table[0].inode_number = 0;
         PCB_array[j].fd_table[0].fileType = 3;
         //stdout members
-        PCB_array[j].fd_table[1].jump_start_idx = (void*)13;
+        PCB_array[j].fd_table[1].jump_start_idx = &terminal_struct;
         PCB_array[j].fd_table[1].file_pos = 0;
         PCB_array[j].fd_table[1].inode_number = 0;
         PCB_array[j].fd_table[1].fileType = 3;
@@ -181,5 +181,19 @@ int remove_fd_entry(int fd){
     return 0;
   }
   return -1;
+}
 
+/**get_current_PCB
+ * returns a pointer to the current 'in use' PCB
+ * returns null if none are found
+ */
+PCB_struct* get_current_PCB(){
+  int i = 0;
+  for (; i < NUMPCBS; i++){
+    if (PCB_array[i].state == 0){
+       // printf("Current PCB: %d\n\n\n\n\n", i);
+       return &PCB_array[i];
+    }
+  }
+  return NULL;
 }

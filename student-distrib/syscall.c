@@ -8,6 +8,7 @@
 #include "paging.h"
 
 #define NUMPCBS 6
+#define TEMPBUFSIZES 1024
 
 int currPid;
 int currFD;
@@ -84,7 +85,7 @@ int32_t sys_close (int32_t fd){
 
 //Maps a page in the user program to the video memory in physical memory
 int32_t sys_vidmap(uint8_t** screen_start){
-  if(screen_start == 0x0 || (screen_start >= 0x400000 && screen_start < 0x800000)){
+  if(screen_start == (uint8_t**)0x0 || (screen_start >= (uint8_t**)0x400000 && screen_start < (uint8_t**)0x800000)){
     return -1;
   }
     return vid_map(screen_start);
@@ -93,4 +94,15 @@ int32_t sys_vidmap(uint8_t** screen_start){
 // error handler
 void syscall_handler(){
     printf("syscall parameters invalid\n");
+}
+
+int32_t sys_getargs(uint8_t* buf, int32_t nbytes){
+    PCB_struct* curpcb = get_current_PCB(); //get a pointer to the current active pcb
+    terminal_getargs(curpcb->args, TEMPBUFSIZES);
+    //printf("%s", curpcb->args);
+    if (curpcb->args[0] == '\0')
+        return -1;
+    memcpy(buf, curpcb->args, nbytes);
+    //printf("%s", curpcb->args);
+    return 0;
 }

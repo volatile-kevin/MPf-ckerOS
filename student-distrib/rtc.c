@@ -86,11 +86,10 @@ int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes){
  * sets the frequency, must be a multiple of 2 [2,8192]
  */
 int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
-	(void) buf;
+  (void) fd;
 	(void) nbytes;
 	int32_t input_freq;
-	input_freq = fd;
-
+  input_freq = *((int32_t*)buf);
 	rate = 0; //reset rate
 
 	if (input_freq){ //if input freq is not 0, 0 disables interrupt

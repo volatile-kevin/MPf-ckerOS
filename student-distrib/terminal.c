@@ -18,17 +18,42 @@
  *   SIDE EFFECTS: buf is read
  */
 int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
-    while(enter_flag){}
-    // if buffer size less than nbytes set max to that, otherwise set to nbytes
-    int count = 0;
-    for (count = 0; buf_kb[count]!='\n'; count++){}
-    count++;
-    int max = BUFFER_SIZE < nbytes ? BUFFER_SIZE : nbytes;
-    max = max < count ? max : count;
-    // move that data into internal buffer from our kb buffer
-    memmove(buf, &buf_kb,max);
-    enter_flag = 1;
-    return max;
+  while(enter_flag){}
+  int i = 0;
+  for (; i < ARG_LENGTH; i++){ //can be changed to memset later
+      storeargs[i] = '\0';
+  }
+  // if buffer size less than nbytes set max to that, otherwise set to nbytes
+  int count = 0;
+
+  int spacecount = -1; //counts the number of spaces in input
+  int offset_arg = 0;  //keeps track of how many bytes we have currently written to the argument
+
+  int max = BUFFER_SIZE < nbytes ? BUFFER_SIZE : nbytes;
+
+  /*copy in the args*/
+  for (count = 0; buf_kb[count]!='\n'; count++){
+      if (spacecount > -1){
+          storeargs[offset_arg] = buf_kb[count]; //set the current byte into the arg buffer
+          offset_arg++;
+      }
+
+      if (buf_kb[count] == ' ' && spacecount == -1){
+          spacecount++; //increment which buffer we write to
+          offset_arg = 0; //reset offset_arg bc we will be writing to new arg buffer
+          max = count;
+      }
+
+  }
+
+  count++;
+
+  max = max < count ? max : count;
+  // move that data into internal buffer from our kb buffer
+  memmove(buf, &buf_kb,max);
+  //printf("%s\n", buf);
+  enter_flag = 1;
+  return max;
 }
 
 /*
@@ -75,4 +100,21 @@ int32_t terminal_open (const uint8_t* filename){
  */
 int32_t terminal_close (int32_t fd){
     return 0;
+}
+
+
+/**terminal_getargs
+ * copy over the arguments from the last terminal read into a buffer
+ * @param0 = destination pointer to char buffer
+ * @param1 = number of bytes to be copied
+ * @returns = nothing, you get nothing. And you can either like it or not
+ * but I really don't give a care. Not one
+ */
+void terminal_getargs(uint8_t* dest, int32_t nbytes){
+    uint32_t i = 0;
+    for (; i < nbytes; i++){
+        dest[i] = storeargs[i];
+    }
+    dest[nbytes-1] = '\n'; //just in case
+    return;
 }

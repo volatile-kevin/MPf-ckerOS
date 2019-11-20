@@ -96,7 +96,14 @@ syscall_close:
 
     iret
 
+# get arguments for the given function call from the terminal
+#
 syscall_getargs:
+    pushl %ecx
+    pushl %ebx
+    call sys_getargs
+    popl %ebx
+    popl %ecx
     iret
 
 syscall_vidmap:

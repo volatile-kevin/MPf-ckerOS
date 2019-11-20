@@ -23,6 +23,7 @@ uint32_t curfile = 1;
 file_desc_t* fdt[8];
 dentry_t currDentry;
 int bytescounter = 0;
+unsigned globalI = 0;
 // this function initializes the file filesystem
 // it reads the boot block and fills global variables with the boot block meta data
 // the only param is the address of the bootblock in memory and is void
@@ -39,9 +40,30 @@ void filesys_init(uint32_t* mod_start){
 // its parameters get passed into read_data, and the offset param for read_data is 0 for now
 // MUST CALL FILE_OPEN BEFORE CALLING THIS
 int32_t file_read (int32_t fd, void* buf, int32_t nbytes) {
-  int32_t bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
-  // PCB.PCB_member[fd_avail].file_pos +=
-  return bytes_copied;
+  // int32_t bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
+  // // PCB.PCB_member[fd_avail].file_pos +=
+  // return bytes_copied;
+  /*********************************************************************/
+  PCB_struct* curPCB = get_current_PCB();
+
+
+   int32_t bytes_copied;
+
+   if (curPCB != NULL && fd > -1){
+     bytes_copied = read_data(currDentry.inodeNum, curPCB->fd_table[fd].file_pos, buf, nbytes);
+     if (bytes_copied != 0){
+       curPCB->fd_table[fd].file_pos += bytes_copied;
+     }
+     else
+       curPCB->fd_table[fd].file_pos = 0;
+   }
+   else{
+     bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
+   }
+
+    return bytes_copied;
+    /*********************************************************************/
+
 }
 
 // do nothing for now cp2
@@ -192,6 +214,14 @@ int dir_open(const uint8_t* filename){
    //uint32_t length = inodeBlock->length;
    unsigned i = 0;
    uint32_t eofLength = inodeBlock->length;
+   /*********************************************************************/
+   if (eofLength <= offset){
+     globalI = 0;
+     return 0;
+   }
+
+   /*********************************************************************/
+
    uint32_t eofCount = 0;
 
    // keep copying until length is 0
@@ -200,13 +230,24 @@ int dir_open(const uint8_t* filename){
      currDataBlock = (dataBlock_t*)(currDataBlock) + inodeBlock->dataBlockNums[i];
      uint32_t currLength = 0;//current amount you can copy from a block of data
      // special cases where we're at the 1st datablock and the offset can cause some issues
-     if(i == 0){
+
+     // if(i == 0){
+     /*********************************************************************/
+
+     if(globalI == 0){
+    /*********************************************************************/
+
        if(length < DATABLOCK_SIZE - offset){
          currLength = length;
        }
        else{
          currLength = DATABLOCK_SIZE - offset;
        }
+       /*********************************************************************/
+       if (currLength > inodeBlock->length)
+          currLength = inodeBlock->length;
+      /*********************************************************************/
+
        memcpy((void*)(buf), (void*)(currDataBlock + offset), currLength);
      }
      else{ //need to change a little to account for multiple data blocks
@@ -225,6 +266,8 @@ int dir_open(const uint8_t* filename){
      eofCount += currLength;
      buf += currLength;
      i++;
+     /*********************************************************************/
+     globalI++;
    }
 
    if(saveLength < eofCount){

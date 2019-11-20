@@ -16,6 +16,7 @@
 #define DATABLOCK_SIZE 4096
 #define MAXFILENAMESIZE 32
 #define FILENAMESIZE_NUL 31
+#define TEMPBUFSIZEH 1024
 
 
 
@@ -53,7 +54,9 @@ typedef struct PCB_struct {
     int ss0;
     int return_label_add;
     int parent_pid;
+    uint8_t args[TEMPBUFSIZEH];
 } PCB_struct;
+
 
 
 
@@ -72,5 +75,7 @@ void init_PCB();
 extern int insert_FDT_entry(uint8_t process_id, unsigned inodeNum, unsigned filePosition, unsigned flags);
 
 int remove_fd_entry(int fd);
+
+extern PCB_struct* get_current_PCB();
 
 #endif

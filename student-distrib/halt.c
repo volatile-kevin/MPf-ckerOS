@@ -23,7 +23,7 @@ int32_t halt(uint8_t status){
 
 
     // get the active pcb
-    int i;
+    int i, j;
     for(i = 0; i < NUMPROCESS; i++){
         if(PCB_array[i].state == 0)
             break;
@@ -39,7 +39,7 @@ int32_t halt(uint8_t status){
     }
     // destruct FDT
     for (i = 2; i < FDTSIZE; i++){
-        PCB_array[curr_pcb].fd_table[i].file_pos = -1;
+        PCB_array[curr_pcb].fd_table[i].file_pos = 0;
         PCB_array[curr_pcb].fd_table[i].fileType = -1;
         PCB_array[curr_pcb].fd_table[i].flags_arr[0] = -1;
         PCB_array[curr_pcb].fd_table[i].flags_arr[1] = -1;
@@ -56,6 +56,10 @@ int32_t halt(uint8_t status){
     PCB_array[curr_pcb].process_id = -1;
     PCB_array[curr_pcb].pcb_in_use = -1;
     PCB_array[curr_pcb].state = -1;
+
+    for (j=0; j < 1023; j++){
+       PCB_array[curr_pcb].args[j] = (uint8_t) '\0';
+     }
 
     int esp = PCB_array[curr_pcb].esp;
     PCB_array[curr_pcb].esp = -1;
