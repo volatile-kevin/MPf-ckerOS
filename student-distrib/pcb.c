@@ -112,7 +112,6 @@ int get_fdAvail(int process_id){
     }
   }
   return -1;
-
 }
 
 // Insert a new entry into a PCB's FDT
@@ -121,7 +120,10 @@ int get_fdAvail(int process_id){
 // side effect: entry placed into PDB's FDT
 int insert_fdt(const uint8_t* filename){
   int i = file_open(filename);
-  int j;
+  if(i == -1){
+    return -1;
+  }
+  int j, retval;
   int currPid, currFD;
   dentry_t dent;
   dentry_t* currDentry = &dent;
@@ -133,7 +135,13 @@ int insert_fdt(const uint8_t* filename){
     }
   }
   currFD = get_fdAvail(currPid);
-  read_dentry_by_name(filename, currDentry);
+  if(currFD == -1){
+    return -1;
+  }
+  retval = read_dentry_by_name(filename, currDentry);
+  if(retval == -1){
+    return -1;
+  }
   // if file was able to be opened
   if(i != -1){
 
@@ -160,7 +168,7 @@ int insert_fdt(const uint8_t* filename){
   return currFD;
 }
 
-void remove_fd_entry(int fd){
+int remove_fd_entry(int fd){
   int j;
   int currPid;
   for(j = 0; j < NUMPCBS; j++){
@@ -168,5 +176,10 @@ void remove_fd_entry(int fd){
       currPid = j;
     }
   }
-  PCB_array[currPid].fd_table[fd].flags_arr[0] = -1;
+  if(PCB_array[currPid].fd_table[fd].flags_arr[0] == 0){
+    PCB_array[currPid].fd_table[fd].flags_arr[0] = -1;
+    return 0;
+  }
+  return -1;
+
 }

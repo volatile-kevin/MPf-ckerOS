@@ -120,7 +120,7 @@ int execute(const uint8_t* fname){
 
   // find first fd
   fd_avail = get_fdAvail(pid);
-
+  PCB_array[pid].fd_table[fd_avail].flags_arr[0] = -1;
   // allocate a page
   map_page((void*)((pid + PIDOFFSET)*FOUR_MB), (void*)VADDRPROGPAGE, USWFLAGS);
   // map_page((fd_avail)*FOUR_MB, 0x08048000, 0x83);

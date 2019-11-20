@@ -128,6 +128,10 @@ syscall_handler_asm:
     # je syscall_open
     # cmp $6, %eax
     # je syscall_close
+    cmpl $0, %eax
+    jle fail_param
+    cmpl $8, %eax
+    jg fail_param
     subl $1, %eax
     jmp *jump_table(,%eax,4)
 
@@ -135,6 +139,9 @@ fail:
     # shouldn't get here
     call syscall_handler
     # popal
+    iret
+fail_param:
+    movl $-1, %eax
     iret
 
 jump_table:

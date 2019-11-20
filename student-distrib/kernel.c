@@ -152,7 +152,7 @@ void entry(unsigned long magic, unsigned long addr) {
      setup_idt_inplace();
     i8259_init();
     init_rtc();
-    // rtc_open((const uint8_t*) " ");
+    rtc_open((const uint8_t*) " ");
     /* Initialize devices, memory, filesystem, enable device interrupts on the
 
      * PIC, any other initialization stuff... */

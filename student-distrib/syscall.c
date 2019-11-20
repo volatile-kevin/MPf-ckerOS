@@ -24,10 +24,16 @@ int32_t sys_execute (const uint8_t* command){
 // read syscall wrapper
 // returns whatever it calls returns
 int32_t sys_read (int32_t fd, void* buf, int32_t nbytes){
+    if(fd < 0 || fd > 7 || fd == 1){
+      return -1;
+    }
     if(fd == 0){
       return terminal_read(fd, buf, nbytes);
     }
     else{
+      if(PCB_array[currPid].fd_table[currFD].flags_arr[0] == -1 || currFD == -1){
+        return -1;
+      }
       return PCB_array[currPid].fd_table[currFD].jump_start_idx->read(fd, buf, nbytes);
       // return (PCB_array[currPid].fd_table[fd].jump_start_idx)
     }
@@ -35,10 +41,16 @@ int32_t sys_read (int32_t fd, void* buf, int32_t nbytes){
 // write syscall wrapper
 // returns whatever it calls returns
 int32_t sys_write (int32_t fd, const void* buf, int32_t nbytes){
+    if(fd < 0 || fd > 7 || fd == 0){
+      return -1;
+    }
     if(fd == 1){
       return terminal_write (fd, buf, nbytes);
     }
     else{
+      if(PCB_array[currPid].fd_table[currFD].flags_arr[0] == -1 || currFD == -1){
+        return -1;
+      }
       return PCB_array[currPid].fd_table[currFD].jump_start_idx->write(fd, buf, nbytes);
     }
 
@@ -46,6 +58,9 @@ int32_t sys_write (int32_t fd, const void* buf, int32_t nbytes){
 // open syscall wrapper
 // returns whatever it calls returns
 int32_t sys_open (const uint8_t* filename){
+  if(filename[0] == 0){
+    return -1;
+  }
   currFD = insert_fdt(filename);
   int j;
   for(j = 0; j < NUMPCBS; j++){
@@ -59,12 +74,19 @@ int32_t sys_open (const uint8_t* filename){
 // close syscall wrapper
 // returns whatever it calls returns
 int32_t sys_close (int32_t fd){
-    remove_fd_entry(fd);
-    return 0;
+    int retval;
+    if(fd < 3 || fd > 7){
+      return -1;
+    }
+    retval = remove_fd_entry(fd);
+    return retval;
 }
 
 //Maps a page in the user program to the video memory in physical memory
 int32_t sys_vidmap(uint8_t** screen_start){
+  if(screen_start == 0x0 || (screen_start >= 0x400000 && screen_start < 0x800000)){
+    return -1;
+  }
     return vid_map(screen_start);
 }
 
