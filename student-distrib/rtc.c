@@ -44,8 +44,7 @@ void rtc_handler(){
     // sti();
     //send the EOI
     send_eoi(IRQ_RTC);
-	waiting = 0;
-
+	   waiting = 0;
 }
 
 /*rtc_open()
@@ -56,7 +55,9 @@ int32_t rtc_open(const uint8_t* filename){
 
 	unsigned int freq = 2; //start at 2 Hz
 	init_rtc();
-	rtc_write(freq, 0, 0);
+  int32_t buf[5];
+  buf[0] = 1;
+	rtc_write(0, &buf, 0);
 	return 0;
 }
 
@@ -65,7 +66,9 @@ int32_t rtc_open(const uint8_t* filename){
  */
 int32_t rtc_close(int32_t fd){
 	(void) fd;
-	rtc_write(0, 0, 0);
+  int32_t buf[1];
+  buf[0] = 0;
+	rtc_write(0, &buf[0], 0);
 	return 0;
 }
 

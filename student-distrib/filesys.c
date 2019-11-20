@@ -212,7 +212,6 @@ int dir_open(const uint8_t* filename){
    // +1 skips the boot block
    dataBlock_t* currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
    //uint32_t length = inodeBlock->length;
-   unsigned i = 0;
    uint32_t eofLength = inodeBlock->length;
    /*********************************************************************/
    if (eofLength <= offset){
@@ -222,7 +221,8 @@ int dir_open(const uint8_t* filename){
 
    /*********************************************************************/
 
-   uint32_t eofCount = 0;
+   uint32_t eofCount = offset;
+   unsigned i = 0;
 
    // keep copying until length is 0
    while(length != 0 && eofLength > eofCount){
@@ -244,11 +244,13 @@ int dir_open(const uint8_t* filename){
          currLength = DATABLOCK_SIZE - offset;
        }
        /*********************************************************************/
-       if (currLength > inodeBlock->length)
-          currLength = inodeBlock->length;
+       if (currLength > inodeBlock->length){
+         length = inodeBlock->length;
+         //length = currLength;
+       }
       /*********************************************************************/
-
        memcpy((void*)(buf), (void*)(currDataBlock + offset), currLength);
+       globalI++;
      }
      else{ //need to change a little to account for multiple data blocks
        if(length % DATABLOCK_SIZE == 0){
@@ -267,13 +269,13 @@ int dir_open(const uint8_t* filename){
      buf += currLength;
      i++;
      /*********************************************************************/
-     globalI++;
    }
+   return eofCount;
 
-   if(saveLength < eofCount){
-     return saveLength;
-   }
-   else{
-     return eofCount;
-   }
+   // if(saveLength < eofCount){
+   //   return saveLength;
+   // }
+   // else{
+   //   return eofCount;
+   // }
  }
