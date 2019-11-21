@@ -94,7 +94,8 @@ int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
     if(input_freq != 2 && input_freq != 4 && input_freq != 8
     && input_freq != 16 && input_freq != 32 && input_freq != 64
     && input_freq != 128 && input_freq != 256 && input_freq != 512
-    &&input_freq != 1024) {return -1;} //have to make sure that the input is a power of 2
+    && input_freq != 1024) {return -1;} //have to make sure that the input is a power of 2
+
     (void) fd;
 	(void) nbytes;
 	rate = 0; //reset rate
