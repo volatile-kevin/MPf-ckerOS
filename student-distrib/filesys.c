@@ -204,7 +204,7 @@ int dir_open(const uint8_t* filename){
    // use inode struct to access data blocks that hold file information
    // loop through the file data and put it into a buffer
    // until length in B is reached
-   uint32_t saveLength = length;
+//   uint32_t saveLength = length;
    // fail
    if(inode > numinodes || inode < 0){
      return -1;

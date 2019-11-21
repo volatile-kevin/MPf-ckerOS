@@ -39,12 +39,13 @@ void rtc_handler(){
     inb(RTC_CMD);
 
     //test
-    test_interrupts();
+    //test_interrupts();
 
     // sti();
     //send the EOI
+    waiting = 0;
+
     send_eoi(IRQ_RTC);
-	   waiting = 0;
 }
 
 /*rtc_open()
@@ -53,11 +54,10 @@ void rtc_handler(){
 int32_t rtc_open(const uint8_t* filename){
 	(void) filename;
 
-	unsigned int freq = 2; //start at 2 Hz
+	int32_t freq = 2;
 	init_rtc();
-  int32_t buf[5];
-  buf[0] = 1;
-	rtc_write(0, &buf, 0);
+
+	rtc_write(0, &freq, 0);//start at 2 Hz
 	return 0;
 }
 
@@ -66,8 +66,8 @@ int32_t rtc_open(const uint8_t* filename){
  */
 int32_t rtc_close(int32_t fd){
 	(void) fd;
-  int32_t buf[1];
-  buf[0] = 0;
+    int32_t buf[1];
+    buf[0] = 0;
 	rtc_write(0, &buf[0], 0);
 	return 0;
 }
@@ -89,10 +89,14 @@ int32_t rtc_read(int32_t fd, void* buf, int32_t nbytes){
  * sets the frequency, must be a multiple of 2 [2,8192]
  */
 int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
-  (void) fd;
+    int32_t input_freq = *((int32_t*)buf);
+
+    if(input_freq != 2 && input_freq != 4 && input_freq != 8
+    && input_freq != 16 && input_freq != 32 && input_freq != 64
+    && input_freq != 128 && input_freq != 256 && input_freq != 512
+    &&input_freq != 1024) {return -1;} //have to make sure that the input is a power of 2
+    (void) fd;
 	(void) nbytes;
-	int32_t input_freq;
-  input_freq = *((int32_t*)buf);
 	rate = 0; //reset rate
 
 	if (input_freq){ //if input freq is not 0, 0 disables interrupt
