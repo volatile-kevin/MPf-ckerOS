@@ -151,9 +151,9 @@ void entry(unsigned long magic, unsigned long addr) {
     /* Init the PIC */
      setup_idt_inplace();
     i8259_init();
-    init_rtc();
+    //init_rtc();
     rtc_open((const uint8_t*) " ");
-    rtc_close(1);
+   // rtc_close(1);
     //rtc_write(1);
     /* Initialize devices, memory, filesystem, enable device interrupts on the
 

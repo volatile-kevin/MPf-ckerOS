@@ -256,16 +256,18 @@ int dir_open(const uint8_t* filename){
        globalI++;
      }
      else{ //need to change a little to account for multiple data blocks
-       if(length % DATABLOCK_SIZE == 0){
+       if(length % DATABLOCK_SIZE == 0 || length > DATABLOCK_SIZE){
          currLength = DATABLOCK_SIZE;
        }
-       else if (length > DATABLOCK_SIZE){
-         currLength = DATABLOCK_SIZE;
+       else if (length + offset > eofLength){
+         currLength = eofLength - offset;
        }
        else{
         currLength = length;
       }
-       memcpy((void*)buf,(void*)currDataBlock, currLength);
+       uint8_t* position = (uint8_t*)(currDataBlock) + offset;
+       //uint8_t* position2 = (uint8_t*)(offset);
+       memcpy((void*)buf,(void*)(position), currLength);
      }
      length -= currLength;
      eofCount += currLength;
