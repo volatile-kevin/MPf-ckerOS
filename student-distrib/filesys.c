@@ -99,7 +99,7 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
   uint8_t* fname;
   fname = (uint8_t*) buf;
   int i;
-  for(i = 0; i < 33; i++){
+  for(i = 0; i < 32; i++){
     fname[i] = 0;
   }
 	dentry_t dentry;
@@ -107,16 +107,16 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
 	// if (!retval){
 		//uint8_t str[32] = dentry.name;
 		// str[31] = '\0';
-		strncpy((int8_t*)fname, (int8_t*)dentry.name, MAXFILENAMESIZE);
+		strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
 		curfile++;
-    bytescounter += retval;
-    if(bytescounter >= 512){
-      bytescounter = 0;
+//    bytescounter += retval;
+    if(curfile == numdentries){
+//      bytescounter = 0;
       curfile = 0;
       return 0;
     }
     else{
-      return 32;
+      return retval;
     }
 }
 
@@ -187,7 +187,9 @@ int dir_open(const uint8_t* filename){
    dentry->fileType = dentryptr->fileType;
    dentry->inodeNum = dentryptr->inodeNum;
 
-   return 32;
+//    printf("%d",strlen((int8_t*)dentry->name));
+//    return strlen((int8_t*)dentry->name);
+    return 32 < strlen((int8_t*)dentry->name) ? 32 : strlen((int8_t*)dentry->name);
  }
 
  /* inode points to data
