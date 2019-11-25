@@ -23,7 +23,6 @@ uint32_t curfile = 1;
 file_desc_t* fdt[8];
 dentry_t currDentry;
 int bytescounter = 0;
-unsigned globalI = 0;
 // this function initializes the file filesystem
 // it reads the boot block and fills global variables with the boot block meta data
 // the only param is the address of the bootblock in memory and is void
@@ -104,20 +103,16 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
   }
 	dentry_t dentry;
 	int32_t retval = read_dentry_by_index(curfile,&dentry);
-	// if (!retval){
-		//uint8_t str[32] = dentry.name;
-		// str[31] = '\0';
-		strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
-		curfile++;
-//    bytescounter += retval;
-    if(curfile == numdentries){
-//      bytescounter = 0;
-      curfile = 0;
-      return 0;
-    }
-    else{
-      return retval;
-    }
+
+  strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
+  curfile++;
+  if(curfile == numdentries){
+    curfile = 0;
+    return 0;
+  }
+  else{
+    return retval;
+  }
 }
 
 // do nothing for now cp2
@@ -225,9 +220,7 @@ int dir_open(const uint8_t* filename){
 
 
    /*********************************************************************/
-
-   uint32_t eofCount = offset; 
-   unsigned i = 0;
+   uint32_t eofCount = offset;
 
    // keep copying until length is 0
    while(length != 0 && eofLength > eofCount){
@@ -236,61 +229,32 @@ int dir_open(const uint8_t* filename){
      uint32_t tempOffset = 0;
      uint32_t currLength = 0;//current amount you can copy from a block of data
      // special cases where we're at the 1st datablock and the offset can cause some issues
-
-     // if(i == 0){
      /*********************************************************************/
-
-     if(globalI == 0){
-    /*********************************************************************/
-
-       if(length < DATABLOCK_SIZE - offset){
-         currLength = length;
-       }
-       else{
-         currLength = DATABLOCK_SIZE - offset;
-       }
-       /*********************************************************************/
-       if (currLength > inodeBlock->length){
-         length = inodeBlock->length;
-         //length = currLength;
-       }
-      /*********************************************************************/
-       memcpy((void*)(buf), (void*)(currDataBlock + offset), currLength);
-       globalI++;
-     }
-     else{ //need to change a little to account for multiple data blocks
+       //only copy one datablock at a time
        if(length % DATABLOCK_SIZE == 0 || length > DATABLOCK_SIZE){
          currLength = DATABLOCK_SIZE;
        }
+       //make sure you don't go over the inode length
        else if (length + offset > eofLength){
          currLength = eofLength - offset;
        }
        else{
         currLength = length;
       }
-        if(offset > DATABLOCK_SIZE){
-          tempOffset  = offset % DATABLOCK_SIZE;
-        }
+
+      if(offset > DATABLOCK_SIZE){
+        tempOffset  = offset % DATABLOCK_SIZE;
+      }
        uint8_t* position = (uint8_t*)(currDataBlock) + tempOffset;
-       //uint8_t* position2 = (uint8_t*)(offset);
        memcpy((void*)buf,(void*)(position), currLength);
-     }
+  
      length -= currLength;
      eofCount += currLength;
      buf += currLength;
-     i++;
      /*********************************************************************/
    }
    if (eofLength <= offset){
-     globalI = 0;
      return 0;
    }
    return eofCount - offset;
-
-   // if(saveLength < eofCount){
-   //   return saveLength;
-   // }
-   // else{
-   //   return eofCount;
-   // }
  }

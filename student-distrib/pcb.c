@@ -64,6 +64,7 @@ void init_PCB(){
 
     //iterate through and populate each pcb, then load into kernel page at 8 kb offsets
     for (j = 0; j < NUMPCBS; j++){
+        //mark all fd entries as not present
         for(i = 0; i < NUM_FDT_ENTRIES; i++){
           PCB_array[j].fd_table[i].present = -1;
         }
