@@ -214,7 +214,7 @@ int dir_open(const uint8_t* filename){
    // set currDataBlock to the very first data block in memory
    // +1 skips the boot block
    dataBlock_t* currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
-   //uint32_t length = inodeBlock->length;
+
    uint32_t eofLength = inodeBlock->length;
    /*********************************************************************/
 
@@ -228,8 +228,7 @@ int dir_open(const uint8_t* filename){
      currDataBlock = (dataBlock_t*)(currDataBlock) + inodeBlock->dataBlockNums[eofCount / DATABLOCK_SIZE];
      uint32_t tempOffset = 0;
      uint32_t currLength = 0;//current amount you can copy from a block of data
-     // special cases where we're at the 1st datablock and the offset can cause some issues
-     /*********************************************************************/
+
        //only copy one datablock at a time
        if(length % DATABLOCK_SIZE == 0 || length > DATABLOCK_SIZE){
          currLength = DATABLOCK_SIZE;
@@ -251,7 +250,6 @@ int dir_open(const uint8_t* filename){
      length -= currLength;
      eofCount += currLength;
      buf += currLength;
-     /*********************************************************************/
    }
    if (eofLength <= offset){
      return 0;
