@@ -104,9 +104,14 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
   }
 	dentry_t dentry;
 	int32_t retval = read_dentry_by_index(curfile,&dentry);
-	strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
-	curfile++;
+	// if (!retval){
+		//uint8_t str[32] = dentry.name;
+		// str[31] = '\0';
+		strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
+		curfile++;
+//    bytescounter += retval;
     if(curfile == numdentries){
+//      bytescounter = 0;
       curfile = 0;
       return 0;
     }
@@ -122,9 +127,6 @@ int dir_write(){
 
 // do nothing for now cp2
 int dir_close(){
-    curfile = 0;
-    bytescounter = 0;
-    globalI = 0;
   return 0;
 }
 
@@ -224,13 +226,14 @@ int dir_open(const uint8_t* filename){
 
    /*********************************************************************/
 
-   uint32_t eofCount = offset;
+   uint32_t eofCount = offset; 
    unsigned i = 0;
 
    // keep copying until length is 0
    while(length != 0 && eofLength > eofCount){
      currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
-     currDataBlock = (dataBlock_t*)(currDataBlock) + inodeBlock->dataBlockNums[i];
+     currDataBlock = (dataBlock_t*)(currDataBlock) + inodeBlock->dataBlockNums[eofCount / DATABLOCK_SIZE];
+     uint32_t tempOffset = 0;
      uint32_t currLength = 0;//current amount you can copy from a block of data
      // special cases where we're at the 1st datablock and the offset can cause some issues
 
@@ -265,7 +268,10 @@ int dir_open(const uint8_t* filename){
        else{
         currLength = length;
       }
-       uint8_t* position = (uint8_t*)(currDataBlock) + offset;
+        if(offset > DATABLOCK_SIZE){
+          tempOffset  = offset % DATABLOCK_SIZE;
+        }
+       uint8_t* position = (uint8_t*)(currDataBlock) + tempOffset;
        //uint8_t* position2 = (uint8_t*)(offset);
        memcpy((void*)buf,(void*)(position), currLength);
      }
