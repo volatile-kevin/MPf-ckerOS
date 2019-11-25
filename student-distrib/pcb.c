@@ -64,7 +64,9 @@ void init_PCB(){
 
     //iterate through and populate each pcb, then load into kernel page at 8 kb offsets
     for (j = 0; j < NUMPCBS; j++){
-        PCB_array[j].fd_table[i].present = -1;
+        for(i = 0; i < NUM_FDT_ENTRIES; i++){
+          PCB_array[j].fd_table[i].present = -1;
+        }
         PCB_array[j].pcb_in_use = -1;
         PCB_array[j].process_id = j;
         PCB_array[j].state = -1;
