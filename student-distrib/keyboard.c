@@ -22,7 +22,7 @@
 #define RSHIFT_UP 0xB6
 #define CAPS_DOWN 0x3A
 #define L_SCANCODE 0x26
-
+#define UP_DOWN 0X48
 
 #define NUMFLAGS 4
 #define ENABLED 1
@@ -36,6 +36,9 @@
 
 int num_chars = 0;
 int curr_idx = 0;
+int save_x, save_y;
+char previous_buf[BUFFER_SIZE];
+int previous_num_chars;
 
 // array of characters, indicies map to scan codes on keyboard
 char char_array[NUM_CHARACTERS] = {0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0, 0,
@@ -74,12 +77,6 @@ void init_keyboard(){
     enable_irq(IRQ_KB); //1 is the keyboard port on the pic
     buf_kb[MAXCHAR] = 0; //Set the last character in the buffer to 0
 		enter_flag = 1;
-    //Enable the cursor
-    // outb(0x0A, 0x3D4);
-    // outb((inb(0x3D5) & 0xC0) | 0, 0x3D5);
-
-    // outb(0x0B, 0x3D4);
-    // outb((inb(0x3D5) & 0xE0) | 1, 0x3D5);
 }
 
 /*
@@ -107,32 +104,26 @@ void keyboard_handler(){
     switch(scanCode){
         case LSHIFT_DOWN: // left-shift pressed
             flag_arr[LSHIFTIDX] = ENABLED;
-            // sti();
             send_eoi(IRQ_KB);
             return;
         case LSHIFT_UP: // left-shift released
             flag_arr[LSHIFTIDX] = DISABLED;
-            // sti();
             send_eoi(IRQ_KB);
             return;
         case RSHIFT_DOWN: // right-shift pressed
             flag_arr[RSHIFTIDX] = ENABLED;
-            // sti();
             send_eoi(IRQ_KB);
             return;
         case RSHIFT_UP: // right-shift released
             flag_arr[RSHIFTIDX] = DISABLED;
-            // sti();
             send_eoi(IRQ_KB);
             return;
         case CTRL_DOWN: // control pressed
             flag_arr[CTRLIDX] ++;
-            // sti();
             send_eoi(IRQ_KB);
             return;
         case CTRL_UP: // control released
             flag_arr[CTRLIDX] --;
-            // sti();
             send_eoi(IRQ_KB);
             return;
         case CAPS_DOWN: // caps-lock pressed
@@ -141,6 +132,16 @@ void keyboard_handler(){
             else
                 flag_arr[CAPSIDX] = ENABLED;
             // sti();
+            send_eoi(IRQ_KB);
+            return;
+        case UP_DOWN:
+            while(get_screen_x() != save_x && get_screen_y() != save_y){
+                backspace();
+            }
+            memmove(&buf_kb, &previous_buf, BUFFER_SIZE);
+            num_chars = previous_num_chars;
+            curr_idx = num_chars;
+            printf(buf_kb);
             send_eoi(IRQ_KB);
             return;
         default:
@@ -169,10 +170,13 @@ void keyboard_handler(){
     // Handles enter.
     // We want a clean buffer and a new line each time we hit enter
     else if (scanCode == ENTER){
+
+        memmove(previous_buf, buf_kb, BUFFER_SIZE);
+        previous_num_chars = num_chars;
         buf_kb[curr_idx] = '\n';
         // ******************** Call terminal read *********************
         putc('\n');
-				enter_flag = 0;
+        enter_flag = 0;
         curr_idx = 0;
         num_chars = 0;
     }
@@ -180,6 +184,10 @@ void keyboard_handler(){
 // l-shift, r-shift, l-ctrl, r-ctrl, caps-lock, enter
     // if we are within our possible characters
     else if (num_chars < MAXCHAR && ((scanCode > 0) & (scanCode < NUM_CHARACTERS))){
+        if(strlen(buf_kb) == 0){
+            save_x = get_screen_x();
+            save_y = get_screen_y();
+        }
         // if one or both shifts are on
         if (flag_arr[LSHIFTIDX] || flag_arr[RSHIFTIDX]){
             // if caps lock is on also

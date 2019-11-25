@@ -32,7 +32,7 @@ int32_t sys_read (int32_t fd, void* buf, int32_t nbytes){
       return terminal_read(fd, buf, nbytes);
     }
     else{
-      if(PCB_array[currPid].fd_table[currFD].flags_arr[0] == -1 || currFD == -1){
+      if(PCB_array[currPid].fd_table[currFD].present == -1 || currFD == -1){
         return -1;
       }
       return PCB_array[currPid].fd_table[currFD].jump_start_idx->read(fd, buf, nbytes);
@@ -49,7 +49,7 @@ int32_t sys_write (int32_t fd, const void* buf, int32_t nbytes){
       return terminal_write (fd, buf, nbytes);
     }
     else{
-      if(PCB_array[currPid].fd_table[currFD].flags_arr[0] == -1 || currFD == -1){
+      if(PCB_array[currPid].fd_table[currFD].present == -1 || currFD == -1){
         return -1;
       }
       return PCB_array[currPid].fd_table[currFD].jump_start_idx->write(fd, buf, nbytes);
@@ -80,6 +80,9 @@ int32_t sys_close (int32_t fd){
       return -1;
     }
     retval = remove_fd_entry(fd);
+    if(retval == 0){
+        currFD--;
+    }
     return retval;
 }
 

@@ -42,11 +42,8 @@ int32_t halt(uint8_t status){
     for (i = 2; i < FDTSIZE; i++){
         PCB_array[curr_pcb].fd_table[i].file_pos = 0;
         PCB_array[curr_pcb].fd_table[i].fileType = -1;
-        PCB_array[curr_pcb].fd_table[i].flags_arr[0] = -1;
-        PCB_array[curr_pcb].fd_table[i].flags_arr[1] = -1;
-        PCB_array[curr_pcb].fd_table[i].flags_arr[2] = -1;
-        PCB_array[curr_pcb].fd_table[i].flags_arr[3] = -1;
-        PCB_array[curr_pcb].fd_table[i].flags_arr[4] = -1;
+        PCB_array[curr_pcb].fd_table[i].present = -1;
+
 
         PCB_array[curr_pcb].fd_table[i].inode_number = -1;
         PCB_array[curr_pcb].fd_table[i].jump_start_idx = 0;

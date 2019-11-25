@@ -20,7 +20,7 @@
 
 
 
-#define FLAGS_SIZE 5 //size of flag array
+//#define FLAGS_SIZE 5 //size of flag array
 #define NUM_FDT_ENTRIES 8 // number of entries in the PCB struct
 
 typedef struct generic_struct{
@@ -33,7 +33,7 @@ typedef struct generic_struct{
 typedef struct fd_table {
     // making flag array with multiple entires (but should only need 1}
     // 1 marks in use, -1 marks free
-    int flags_arr[FLAGS_SIZE];
+    int present;
     int file_pos;
     int inode_number;
     // this will be what we use to index into the jump table of all the different

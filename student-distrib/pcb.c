@@ -64,10 +64,7 @@ void init_PCB(){
 
     //iterate through and populate each pcb, then load into kernel page at 8 kb offsets
     for (j = 0; j < NUMPCBS; j++){
-        for (i = 0; i < NUM_FDT_ENTRIES; i++){
-            // set -1 to say that it is currently not set
-            PCB_array[j].fd_table[i].flags_arr[0] = -1;
-        }
+        PCB_array[j].fd_table[i].present = -1;
         PCB_array[j].pcb_in_use = -1;
         PCB_array[j].process_id = j;
         PCB_array[j].state = -1;
@@ -106,8 +103,8 @@ int getPID(){
 int get_fdAvail(int process_id){
   int i;
   for(i = SKIPSTDINSTDOUT; i < NUM_FDT_ENTRIES; i++){
-    if(PCB_array[process_id].fd_table[i].flags_arr[0] == -1){
-      PCB_array[process_id].fd_table[i].flags_arr[0] = 0;
+    if(PCB_array[process_id].fd_table[i].present == -1){
+      PCB_array[process_id].fd_table[i].present = 0;
       return i;
     }
   }
@@ -143,15 +140,10 @@ int insert_fdt(const uint8_t* filename){
     return -1;
   }
   // if file was able to be opened
-  if(i != -1){
-
     // set the data in the FDT entry based on the opened file
     PCB_array[currPid].fd_table[currFD].fileType = currDentry->fileType;
     PCB_array[currPid].fd_table[currFD].inode_number = currDentry->inodeNum;
-  }
-  else{
-    return i;
-  }
+
   // set the correct fops stuct depending on the file type
   switch(PCB_array[currPid].fd_table[currFD].fileType)
   {
@@ -165,7 +157,9 @@ int insert_fdt(const uint8_t* filename){
       PCB_array[currPid].fd_table[currFD].jump_start_idx = &file_struct;
       break;
   }
-  return currFD;
+    PCB_array[currPid].fd_table[currFD].present = 0;
+
+    return currFD;
 }
 
 int remove_fd_entry(int fd){
@@ -176,8 +170,8 @@ int remove_fd_entry(int fd){
       currPid = j;
     }
   }
-  if(PCB_array[currPid].fd_table[fd].flags_arr[0] == 0){
-    PCB_array[currPid].fd_table[fd].flags_arr[0] = -1;
+  if(PCB_array[currPid].fd_table[fd].present == 0){
+    PCB_array[currPid].fd_table[fd].present = -1;
     return 0;
   }
   return -1;

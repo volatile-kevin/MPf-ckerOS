@@ -104,14 +104,9 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
   }
 	dentry_t dentry;
 	int32_t retval = read_dentry_by_index(curfile,&dentry);
-	// if (!retval){
-		//uint8_t str[32] = dentry.name;
-		// str[31] = '\0';
-		strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
-		curfile++;
-//    bytescounter += retval;
+	strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
+	curfile++;
     if(curfile == numdentries){
-//      bytescounter = 0;
       curfile = 0;
       return 0;
     }
@@ -127,6 +122,9 @@ int dir_write(){
 
 // do nothing for now cp2
 int dir_close(){
+    curfile = 0;
+    bytescounter = 0;
+    globalI = 0;
   return 0;
 }
 

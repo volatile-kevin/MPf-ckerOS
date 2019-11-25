@@ -260,6 +260,20 @@ void putc(uint8_t c) {
 
 }
 
+int get_screen_x(){
+    return screen_x;
+}
+
+int get_screen_y(){
+    return screen_y;
+}
+
+void set_cursor(int x, int y){
+    screen_x = x;
+    screen_y = y;
+    update_cursor(screen_x, screen_y);
+}
+
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
  * Inputs: uint32_t value = number to convert
  *            int8_t* buf = allocated buffer to place string in
