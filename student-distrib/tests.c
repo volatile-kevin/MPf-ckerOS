@@ -7,6 +7,8 @@
 #include "rtc.h"
 #include "execute.h"
 #include "pcb.h"
+#include "schedule.h"
+
 #define PASS 1
 #define FAIL 0
 #define BUF_SIZE 3
@@ -331,6 +333,7 @@ void launch_tests(){
 	// map_page();
 	// must initialize the PCB struct
 	init_PCB();
+	// init_PIT(1);
 	// start the shell
 	i = execute((uint8_t*)"shell");
 	//TEST_OUTPUT("terminal_write_works", terminal_write_works());
