@@ -97,7 +97,8 @@ void setup_idt_inplace(){
         SET_IDT_ENTRY(idt[29], gen_purp);
         SET_IDT_ENTRY(idt[30], gen_purp);
         SET_IDT_ENTRY(idt[31], gen_purp);
-        SET_IDT_ENTRY(idt[32], gen_purp);
+
+        SET_IDT_ENTRY(idt[32], pit_asm);
         SET_IDT_ENTRY(idt[33], keyboard_asm);
         SET_IDT_ENTRY(idt[34], gen_purp);
         SET_IDT_ENTRY(idt[35], gen_purp);

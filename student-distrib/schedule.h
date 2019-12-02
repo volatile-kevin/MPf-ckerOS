@@ -1,3 +1,5 @@
 
+void beep(int frequency);
 
-void init_PIT(uint32_t frequency);
+extern void init_PIT(uint32_t frequency);
+extern void pit_handler();

@@ -3,6 +3,15 @@
 #include "lib.h"
 #include "types.h"
 
+#define RTC_DATA 0x70 //rtc data port
+#define RTC_CMD  0x71 //rtc command port
+#define NMI      0x80 //non maskable interrupt byte
+#define REGBIT   0x40 //register bit of rtc
+#define REGC     0x0C //Register C of RTC
+#define IRQ_RTC  8 //IRQ line of RTC
+#define MAX_FREQ 16384 //maximum frequency of the rtc (theoretically)
+#define RTC_RATE_MAX 15 //1 hz is our minimum frequency
+#define RTC_RATE_MIN 4 //1024 hz is our maximum frequency
 /*init_rtc()
  * Initialize the rtc to interrupt at 1024 Hz
  * output data to the 

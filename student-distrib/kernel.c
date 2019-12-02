@@ -17,6 +17,7 @@
 #include "filesys.h"
 #include "pcb.h"
 #include "execute.h"
+#include "schedule.h"
 
 #define RUN_TESTS
 
@@ -173,6 +174,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
     filesys_init(modStartTemp);
     pcb_filesys_init(modStartTemp);
+
     // int32_t fd = 0;
     // int32_t nbytes = 1024;
     // uint8_t buf[1024];
@@ -203,6 +205,10 @@ void entry(unsigned long magic, unsigned long addr) {
 #endif
     /* Execute the first program ("shell") ... */
     init_PCB();
+    // cli();
+	// init_PIT(20);
+	// sti();
+    beep(440);
     execute((uint8_t*)"shell");
     /* Spin (nicely, so we don't chew up cycles) */
     asm volatile (".1: hlt; jmp .1;");

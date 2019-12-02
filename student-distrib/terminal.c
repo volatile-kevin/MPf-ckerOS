@@ -6,6 +6,8 @@
 #include "tests.h"
 #include "keyboard.h"
 #include "terminal.h"
+#include "schedule.h"
+#include "types.h"
 
 /*
  * terminal_read
@@ -18,7 +20,8 @@
  *   SIDE EFFECTS: buf is read
  */
 int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
-  while(enter_flag){}
+  while(enter_flag){
+  }
   int i = 0;
   for (; i < ARG_LENGTH; i++){ //can be changed to memset later
       storeargs[i] = '\0';

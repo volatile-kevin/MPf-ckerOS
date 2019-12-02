@@ -1,6 +1,6 @@
 .globl rtc_asm
 .globl keyboard_asm
-
+.globl pit_asm
 
  #
  #      keyboard_asm
@@ -32,4 +32,11 @@ rtc_asm:
     call rtc_handler
     popal
     iret
+
+pit_asm:
+    pushal
+    call pit_handler
+    popal
+    iret
+
 

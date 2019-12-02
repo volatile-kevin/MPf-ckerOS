@@ -1,14 +1,6 @@
 #include "rtc.h"
 
-#define RTC_DATA 0x70 //rtc data port
-#define RTC_CMD  0x71 //rtc command port
-#define NMI      0x80 //non maskable interrupt byte
-#define REGBIT   0x40 //register bit of rtc
-#define REGC     0x0C //Register C of RTC
-#define IRQ_RTC  8 //IRQ line of RTC
-#define MAX_FREQ 16384 //maximum frequency of the rtc (theoretically)
-#define RTC_RATE_MAX 15 //1 hz is our minimum frequency
-#define RTC_RATE_MIN 4 //1024 hz is our maximum frequency
+
 
 unsigned int rate; //file scope variable to keep track of current rate
 uint8_t waiting = 0; //variable that keeps track of if the rtc is blocked
@@ -39,7 +31,7 @@ void rtc_handler(){
     inb(RTC_CMD);
 
     //test
-    //test_interrupts();
+    // test_interrupts();
 
     // sti();
     //send the EOI

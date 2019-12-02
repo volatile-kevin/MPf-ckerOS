@@ -333,7 +333,7 @@ void launch_tests(){
 	// map_page();
 	// must initialize the PCB struct
 	init_PCB();
-	// init_PIT(1);
+
 	// start the shell
 	i = execute((uint8_t*)"shell");
 	//TEST_OUTPUT("terminal_write_works", terminal_write_works());
