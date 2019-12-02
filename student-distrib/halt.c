@@ -35,7 +35,7 @@ int32_t halt(uint8_t status){
        PCB_array[curr_pcb].pcb_in_use = -1;
       while(1){
         printf("Re-"); //restart the base shell
-        execute((uint8_t*)"shell");
+        execute((uint8_t*)"shell", 1);
       }
     }
     // destruct FDT

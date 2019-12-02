@@ -5,6 +5,10 @@
 #ifndef _LIB_H
 #define _LIB_H
 
+#define VIDEO_BUFFER1 (VIDEO + NUM_ROWS*NUM_COLS*2)
+#define VIDEO_BUFFER2 (VIDEO_BUFFER2 + NUM_ROWS*NUM_COLS*2)
+#define VIDEO_BUFFER3 (VIDEO_BUFFER3 + NUM_ROWS*NUM_COLS*2)
+
 #include "types.h"
 
 int32_t printf(int8_t *format, ...);

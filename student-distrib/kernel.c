@@ -205,11 +205,11 @@ void entry(unsigned long magic, unsigned long addr) {
 #endif
     /* Execute the first program ("shell") ... */
     init_PCB();
-    // cli();
-	// init_PIT(20);
-	// sti();
-    beep(440);
-    execute((uint8_t*)"shell");
+    cli();
+	init_PIT(20);
+	sti();
+    // beep(440);
+    // execute((uint8_t*)"shell", 1);
     /* Spin (nicely, so we don't chew up cycles) */
     asm volatile (".1: hlt; jmp .1;");
 }

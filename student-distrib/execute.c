@@ -19,6 +19,9 @@
 #define EIGHTKB 0x2000
 #define KSTACKOFFSET 4
 #define MAXCOMMANDSIZE 128
+
+
+
 uint32_t firstInstruct; //entrypoint of program img
 PCB_struct PCB_array[NUMPROCESSES]; //array of PCBs, maximum processes for this cp is 6
 
@@ -65,7 +68,7 @@ int load(const uint8_t* fname, uint8_t* buf){
 // parameters: filename
 // returns: -1 on failure, 0 on success
 // side effect: will go to userspace through context switch. Child processes will return to label before return
-int execute(const uint8_t* fname){
+int execute(const uint8_t* fname, uint8_t switch_after_creation){
   // copy into this buffer
   uint8_t temp[MAXCOMMANDSIZE];
   memmove(temp, fname, MAXCOMMANDSIZE);
@@ -151,7 +154,9 @@ int execute(const uint8_t* fname){
   // flush the tlb, page change
   flush_tlb();
 
-  switch_to_user_mode(firstInstruct);
+  //do not want to switch to user when creating the terminals
+  if (switch_after_creation) 
+    switch_to_user_mode(firstInstruct);
 
   // child processes will jump here on halt return
   __asm__ __volatile__
