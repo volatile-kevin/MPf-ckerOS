@@ -13,7 +13,50 @@
 #define MASK 3
 
 volatile uint8_t pitCount = 0;
+volatile uint8_t pitIntrCount = 0;
 
+
+
+// void init_tasks(){
+//     asm volatile(
+//     "movl %%eax, %%cr3\n\
+//      movl %0, %%eax"
+//     :"=m"(mainTask.regs.cr3)
+//     :
+//     :"%eax"
+//     );
+
+//     asm volatile(
+//     "pushfl \n\
+//      movl %%eax, (%%esp) \n\
+//      movl %0, %%eax \n\
+//      popfl"
+//     :"=m"(mainTask.regs.eflags)
+//     :
+//     :"%eax"
+//     );
+// }
+
+// void createTask(Task *task, uint32_t flags, uint32_t *pagedir){
+//     // int i;
+//     // int pid;
+//     // for(i = 0; i < 6; i++){
+//     //     if(PCB_array[i].state == 0){
+//     //         pid = i;
+//     //     }
+//     // }
+//     task->regs.eax = 0;
+//     task->regs.ebx = 0;
+//     task->regs.ecx = 0;
+//     task->regs.edx = 0;
+//     task->regs.esi = 0;
+//     task->regs.edi = 0;
+//     task->regs.eflags = flags;
+//     task->regs.cr3 = (uint32_t) pagedir;
+//     // task->regs.esp = PCB_array[pid].esp;
+//     task->next = 0;
+
+// }
 // makes beep!
 // take in frequency that you want the computer to play
 // returns nothing
@@ -67,13 +110,14 @@ void pit_handler(){
     // outb(REGC, PIT0);
     // // get rid of its data
     // inb(PIT_CMD);
-
+    pitIntrCount++;
     test_interrupts();
 
     if(pitCount == 0 || pitCount == 1 || pitCount == 2){
         pitCount++;
         spawn_shells(pitCount);
     }
+
 }
 
 void spawn_shells(int pid){
@@ -92,5 +136,9 @@ void switch_terminal(uint8_t terminal){
     // copy the new buffer into video memory
     //
     return;
+}
+
+void switch_to_task(){
+    
 }
 

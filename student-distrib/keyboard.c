@@ -7,6 +7,8 @@
 #include "keyboard.h"
 #include "types.h"
 #include "terminal.h"
+#include "schedule.h"
+
 
 #define NUM_CHARACTERS 0x3B
 #define KEYBOARD_PORT 0x60
@@ -23,8 +25,11 @@
 #define CAPS_DOWN 0x3A
 #define L_SCANCODE 0x26
 #define UP_DOWN 0X48
+#define ALT_DOWN 0x38
+#define ALT_UP 0xB8
 
-#define NUMFLAGS 4
+
+#define NUMFLAGS 5
 #define ENABLED 1
 #define DISABLED 0
 
@@ -32,6 +37,7 @@
 #define RSHIFTIDX 1
 #define CTRLIDX 2
 #define CAPSIDX 3
+#define ALTIDX 4
 #define IRQ_KB 1
 
 int num_chars = 0;
@@ -61,8 +67,8 @@ char char_array_noshift_cap[NUM_CHARACTERS] = {0, 0, '1', '2', '3', '4', '5', '6
 	 'D', 'F', 'G', 'H', 'J', 'K', 'L' , ';', '\'', '`', 0, '\\', 'Z', 'X', 'C', 'V',
 	 'B', 'N', 'M',',', '.', '/', 0, '*', 0, ' ', 0};
 
-// l-shift, r-shift, ctrl, caps-lock
-int flag_arr[NUMFLAGS] = {0, 0, 0, 0};
+// l-shift, r-shift, ctrl, caps-lock, alt
+int flag_arr[NUMFLAGS] = {0, 0, 0, 0, 0};
 
 /*
  * init_keyboard
@@ -79,6 +85,30 @@ void init_keyboard(){
 		enter_flag = 1;
 }
 
+void kb_terminal_switch_helper(int f_scancode){
+// (((scanCode == 0x3B) || (scanCode == 0x3C) || (scanCode == 0x3D)
+    int to_switch;
+   
+    if (f_scancode == 0x3B){
+        to_switch = 0;
+    }
+    else if (f_scancode == 0x3C){
+        to_switch = 1;
+    }
+    else{
+        to_switch = 2;
+    }
+
+    // if visible terminal is the one we are currently on, do nothing
+    if (visible == to_switch){
+        return;
+    }
+    // if not, call to switch
+    else {
+        switch_terminal(to_switch);
+        return;
+    }
+}
 /*
  * keyboard_handler
  *   DESCRIPTION: Takes input from keyboard and displays it
@@ -134,7 +164,7 @@ void keyboard_handler(){
             // sti();
             send_eoi(IRQ_KB);
             return;
-        case UP_DOWN:
+        case UP_DOWN: // up pressed
             while(get_screen_x() != save_x && get_screen_y() != save_y){
                 backspace();
             }
@@ -142,6 +172,14 @@ void keyboard_handler(){
             num_chars = previous_num_chars;
             curr_idx = num_chars;
             printf(buf_kb);
+            send_eoi(IRQ_KB);
+            return;
+        case ALT_DOWN: // alt pressed
+            flag_arr[ALTIDX] ++;
+            send_eoi(IRQ_KB);
+            return;
+        case ALT_UP: // alt released
+            flag_arr[ALTIDX] --;
             send_eoi(IRQ_KB);
             return;
         default:
@@ -174,11 +212,15 @@ void keyboard_handler(){
         memmove(previous_buf, buf_kb, BUFFER_SIZE);
         previous_num_chars = num_chars;
         buf_kb[curr_idx] = '\n';
-        // ******************** Call terminal read *********************
+        // ****************** Call terminal read *******************
         putc('\n');
         enter_flag = 0;
         curr_idx = 0;
         num_chars = 0;
+    }
+    // f1, f2, f3
+    else if (((scanCode == 0x3B) || (scanCode == 0x3C) || (scanCode == 0x3D)) && flag_arr[ALTIDX]){
+        kb_terminal_switch_helper(scanCode);
     }
 
 // l-shift, r-shift, l-ctrl, r-ctrl, caps-lock, enter

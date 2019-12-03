@@ -29,7 +29,7 @@ int32_t halt(uint8_t status){
             break;
     }
     int curr_pcb = i;
-    if(curr_pcb == 0){
+    if(PCB_array[curr_pcb].parent_pid == -1){
       // return -1;
        PCB_array[curr_pcb].state = -1;
        PCB_array[curr_pcb].pcb_in_use = -1;
