@@ -4,10 +4,10 @@
 #include "lib.h"
 #include "types.h"
 #include "rtc.h"
-
+#include "x86_desc.h"
+#include "schedule_asm.h"
 
 void beep(int frequency);
-
 
 
 uint8_t visible;

@@ -1,6 +1,5 @@
 #include "schedule.h"
 
-
 #define PIT0 0x40         
 #define PIT1 0x41
 #define PIT2 0x42
