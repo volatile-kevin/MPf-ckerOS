@@ -3,6 +3,8 @@
 
 #pragma once
 #include "types.h"
+#include "x86_desc.h"
+
 
 #define NAME_SIZE 32
 #define NUMDATABLOX 1023
@@ -54,6 +56,7 @@ typedef struct PCB_struct {
     int ss0;
     int return_label_add;
     int parent_pid;
+    tss_t tss_state;
     uint8_t args[TEMPBUFSIZEH];
 } PCB_struct;
 
