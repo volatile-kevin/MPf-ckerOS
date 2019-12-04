@@ -138,6 +138,6 @@ void switch_terminal(uint8_t terminal){
 }
 
 void switch_to_task(){
-    
+    save_registers(&tss);
 }
 
