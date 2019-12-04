@@ -130,6 +130,24 @@ void spawn_shells(int pid){
     //while (1);
 }
 
+void init_terminals(){
+
+    // mapping the 3 video buffers for use with the user accessible flag
+    // map_page((void *)VIDEO_BUFFER1, (void*)VIDEO_BUFFER1,(unsigned int) 0x7);
+    // map_page((void *)VIDEO_BUFFER2, (void*)VIDEO_BUFFER2,(unsigned int) 0x7);
+    // map_page((void *)VIDEO_BUFFER3, (void*)VIDEO_BUFFER3,(unsigned int) 0x7);
+
+
+
+    // setup initial video buffers for the terminal structs
+    terminals[0].video_buffer = (uint8_t *)VIDEO_BUFFER1;
+    terminals[1].video_buffer = (uint8_t *)VIDEO_BUFFER2;
+    terminals[2].video_buffer = (uint8_t *)VIDEO_BUFFER3;
+
+}
+
+
+
 void switch_terminal(uint8_t terminal){
     // copy the video memory into the current buffer??
     // copy the new buffer into video memory
@@ -138,6 +156,7 @@ void switch_terminal(uint8_t terminal){
 }
 
 void switch_to_task(){
-    save_registers(&tss);
+
+    //save_registers(&tss);
 }
 

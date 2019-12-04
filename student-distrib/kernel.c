@@ -164,6 +164,7 @@ void entry(unsigned long magic, unsigned long addr) {
     init_keyboard();
 
     init_paging();
+    //init_terminals()
 
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your

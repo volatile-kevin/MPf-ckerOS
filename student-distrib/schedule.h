@@ -16,6 +16,8 @@ typedef struct terminal_t {
     int shell_pid; //current shell that corresponds to this terminal
     uint8_t* video_buffer; //pointer to this terminals video buffer
     char buf_kb[128]; //keyboard buffer
+    tss_t tss_save;
+    struct terminal_t * next; //next terminal to switch to
 } terminal_t;
 
 // typedef struct {
@@ -31,7 +33,6 @@ typedef struct terminal_t {
 // static Task * runningTask;
 // static Task mainTask;
 // static Task otherTask;
-
 terminal_t terminals[3];
 
 extern void init_PIT(uint32_t frequency);
