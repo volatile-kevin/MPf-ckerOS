@@ -8,18 +8,7 @@
 #include "lib.h"
 #include "schedule.h"
 
-#define HEADERSIZE 28
-#define MAXBYTES 0x3B8000
-#define HEADERBUFSIZE 100
-#define NUMPROCESSES 6
-#define VADDRPROGIMG 0x08048000
-#define PIDOFFSET 2
-#define VADDRPROGPAGE 0x08000000
-#define USWFLAGS 0x87
-#define KERNELSTACK 0x800000
-#define EIGHTKB 0x2000
-#define KSTACKOFFSET 4
-#define MAXCOMMANDSIZE 128
+
 
 
 

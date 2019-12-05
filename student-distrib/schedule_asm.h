@@ -1,6 +1,5 @@
-#include "x86_desc.h"
+#include "types.h"
 
-
-void save_registers(tss_t* curr_tss);
+void update_stack(uint32_t esp, uint32_t ebp);
 
 

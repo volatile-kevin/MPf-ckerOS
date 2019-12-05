@@ -1,7 +1,7 @@
 .globl rtc_asm
 .globl keyboard_asm
 .globl pit_asm
-
+.globl pit_return
  #
  #      keyboard_asm
  #   DESCRIPTION: Linkage that stores register values before calling our c function
@@ -36,6 +36,8 @@ rtc_asm:
 pit_asm:
     pushal
     call pit_handler
+
+pit_return:
     popal
     iret
 

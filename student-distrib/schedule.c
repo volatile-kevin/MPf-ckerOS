@@ -120,9 +120,10 @@ void init_PIT(uint32_t frequency){
 // keeps a counter of amount of interrupts
 // should spawn new shells at 0, 1, 2 interrupts
 void pit_handler(){
+    uint32_t esp;
+    uint32_t ebp;
     send_eoi(PIT_IRQ);
-    //write to register C so that the interrupts can continously trigger
-    // outb(REGC, PIT0);
+
     // // get rid of its data
     // inb(PIT_CMD);
     pitIntrCount++;
@@ -138,21 +139,33 @@ void pit_handler(){
         switch_terminal(0);
         pitCount++;
     }
-
     //save the current tss state
     PCB_array[terminals[cur_terminal].curr_process].tss_state = tss;
+
     //update the scheduled terminal
     cur_terminal = (cur_terminal + 1)%3;
     //load the newly scheduled tss
     tss = PCB_array[terminals[cur_terminal].curr_process].tss_state;
-
+    esp = PCB_array[terminals[cur_terminal].curr_process].esp;
+    ebp = PCB_array[terminals[cur_terminal].curr_process].ebp;
     //page the video memory to write to
     if (cur_terminal == visible)
         map_video_page(0);
     else
-        map_video_page(cur_terminal);
+        map_video_page(1+cur_terminal);
+    
+    map_page((void*)((terminals[cur_terminal].curr_process + PIDOFFSET)*FOUR_MB), (void*)VADDRPROGPAGE, USWFLAGS);
+    tss.esp0 = KERNELSTACK - (terminals[cur_terminal].curr_process * EIGHTKB) - KSTACKOFFSET;
 
-    switch_to_task();
+    // switch_to_task();
+    update_stack(esp, ebp);
+    // asm volatile(
+    //     "movl %0, %%esp\n\
+    //         movl %1, %%ebp \n\
+    //         jmp *%2"
+    //     : //input operands
+    //     : "r"(esp), "r"(ebp), "r"(return_label_address)//clobbers and goto labels
+    //     );
 }
 
 /**
