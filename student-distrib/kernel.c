@@ -175,6 +175,10 @@ void entry(unsigned long magic, unsigned long addr) {
 
     filesys_init(modStartTemp);
     pcb_filesys_init(modStartTemp);
+    init_PCB();
+
+    init_terminals();
+
 
     // int32_t fd = 0;
     // int32_t nbytes = 1024;
@@ -205,7 +209,6 @@ void entry(unsigned long magic, unsigned long addr) {
 //     launch_tests();
 #endif
     /* Execute the first program ("shell") ... */
-    init_PCB();
     cli();
 	init_PIT(20);
 	sti();

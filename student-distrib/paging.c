@@ -35,6 +35,10 @@ void init_paging(void){
     //This sets the entry in the page table for video memory
 
     page_table[VIDEO_MEM_INDEX] |= 3;
+    page_table[VIDEO_MEM_INDEX+1] |= 7;
+    page_table[VIDEO_MEM_INDEX+2] |= 7;
+    page_table[VIDEO_MEM_INDEX+3] |= 7;
+
 
 
     //Add the first page table to the page directory

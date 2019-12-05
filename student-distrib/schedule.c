@@ -1,4 +1,11 @@
 #include "schedule.h"
+#include "pcb.h"
+#include "execute.h"
+#include "halt.h"
+#include "lib.h"
+#include "rtc.h"
+#include "keyboard.h"
+#include "paging.h"
 
 #define PIT0 0x40         
 #define PIT1 0x41
@@ -11,30 +18,38 @@
 #define SPEAKERPORT 0x61
 #define MASK 3
 
+#define VIDEO       0xB8000
+#define NUM_COLS    80
+#define NUM_ROWS    25
+#define VIDEO_BUFFER1 (VIDEO + 0x1000)
+#define VIDEO_BUFFER2 (VIDEO_BUFFER1 +  0x1000)
+#define VIDEO_BUFFER3 (VIDEO_BUFFER2 +  0x1000)
+
 volatile uint8_t pitCount = 0;
 volatile uint8_t pitIntrCount = 0;
 
+terminal_t* cur_terminal;
+/*
+void init_tasks(){
+    asm volatile(
+    "movl %%eax, %%cr3\n\
+     movl %0, %%eax"
+    :"=m"(mainTask.regs.cr3)
+    :
+    :"%eax"
+    );
 
-
-// void init_tasks(){
-//     asm volatile(
-//     "movl %%eax, %%cr3\n\
-//      movl %0, %%eax"
-//     :"=m"(mainTask.regs.cr3)
-//     :
-//     :"%eax"
-//     );
-
-//     asm volatile(
-//     "pushfl \n\
-//      movl %%eax, (%%esp) \n\
-//      movl %0, %%eax \n\
-//      popfl"
-//     :"=m"(mainTask.regs.eflags)
-//     :
-//     :"%eax"
-//     );
-// }
+    asm volatile(
+    "pushfl \n\
+     movl %%eax, (%%esp) \n\
+     movl %0, %%eax \n\
+     popfl"
+    :"=m"(mainTask.regs.eflags)
+    :
+    :"%eax"
+    );
+}
+*/
 
 // void createTask(Task *task, uint32_t flags, uint32_t *pagedir){
 //     // int i;
@@ -94,7 +109,7 @@ void init_PIT(uint32_t frequency){
    // Send the frequency divisor.
     outb(low, PIT0);
     outb(high, PIT0);
-
+    pitCount = 0;
     enable_irq(PIT_IRQ); //tell the PIC to enable this interrupt
 
 }
@@ -111,52 +126,109 @@ void pit_handler(){
     // inb(PIT_CMD);
     pitIntrCount++;
     test_interrupts();
+    PCB_struct* pcb = get_current_PCB();
 
-    if(pitCount == 0 || pitCount == 1 || pitCount == 2){
-        pitCount++;
-        spawn_shells(pitCount);
-    }
+    
 
 }
 
-void spawn_shells(int pid){
-
-    if (pitCount < 3)
-        execute((uint8_t*)"shell", 0);
-    else
-        execute((uint8_t*)"shell", 1);
-
-    printf("pit count:%d\n", pitCount);
-    //while (1);
-}
-
+/**
+ * init_terminals
+ * No Parameters
+ * No Return
+ * -----------------
+ * Initializes all information needed by terminals.
+ * Sets up the video buffers and clears all variables
+ */
 void init_terminals(){
-
-    // mapping the 3 video buffers for use with the user accessible flag
-    // map_page((void *)VIDEO_BUFFER1, (void*)VIDEO_BUFFER1,(unsigned int) 0x7);
-    // map_page((void *)VIDEO_BUFFER2, (void*)VIDEO_BUFFER2,(unsigned int) 0x7);
-    // map_page((void *)VIDEO_BUFFER3, (void*)VIDEO_BUFFER3,(unsigned int) 0x7);
-
-
-
     // setup initial video buffers for the terminal structs
     terminals[0].video_buffer = (uint8_t *)VIDEO_BUFFER1;
+    memset((void*)VIDEO_BUFFER1, 0, FOUR_KB);
     terminals[1].video_buffer = (uint8_t *)VIDEO_BUFFER2;
+    memset((void*)VIDEO_BUFFER2, 0, FOUR_KB);
     terminals[2].video_buffer = (uint8_t *)VIDEO_BUFFER3;
+    memset((void*)VIDEO_BUFFER3, 0, FOUR_KB);
 
+    //This for loop iterates all 3 terminal structs and sets all of the variables to 0/blank
+    int i;
+    for(i = 0; i < NUM_TERMINALS; i++){
+        terminals[i].shell_pid = i;
+        memset(terminals[i].video_buffer, 0, FOUR_KB);
+        memset(terminals[i].buf_kb, 0, BUFFER_SIZE);
+        terminals[i].screen_x = 0;
+        terminals[i].screen_y = 0;
+        terminals[i].curr_idx = 0;
+        terminals[i].num_chars = 0;
+        terminals[i].save_x = 0;
+        terminals[i].save_y = 0;
+        terminals[i].prev_num_chars = 0;
+        memset(terminals[i].prev_buf, 0, BUFFER_SIZE);
+    }
+
+    i = 0;
+    if(pitCount < NUM_TERMINALS){
+        switch_terminal(pitCount);
+        execute((uint8_t *) "shell", 1);
+        pitCount++;
+    } else if (pitCount == NUM_TERMINALS) {
+        switch_terminal(0);
+        pitCount++;
+    }
 }
 
+/**
+ * switch_terminal
+ * @param terminal_src
+ * @param terminal_dest
+ * Returns nothing
+ * ----------------------------
+ * Saves and restore info that is associated with each terminal and also updates which terminal is active
+ */
+void switch_terminal(uint8_t terminal_dest){
 
+    // requested destination terminal index is the same as current (src) terminal
+    if (terminal_dest == visible){
+        return;
+    }
 
-void switch_terminal(uint8_t terminal){
-    // copy the video memory into the current buffer??
-    // copy the new buffer into video memory
-    //
+    // supplied terminal indicies out of range
+    if ((terminal_dest) > NUM_TERMINALS){
+        return;
+    }
+
+    // stores keyboard information
+    terminals[visible].screen_x = get_screen_x();
+    terminals[visible].screen_y = get_screen_y();
+    terminals[visible].curr_idx = get_curr_idx();
+    terminals[visible].num_chars = get_num_chars();
+    terminals[visible].save_x = get_save_x();
+    terminals[visible].save_y = get_save_y();
+    terminals[visible].prev_num_chars = get_previous_num_chars();
+
+    // Saves the history buffer, keyboard buffer, and video buffer
+    get_previous_buf(terminals[visible].prev_buf);
+    memcpy(terminals[visible].video_buffer, (void*)VIDEO_MEM, FOUR_KB);
+    memcpy(terminals[visible].buf_kb, buf_kb, BUFFER_SIZE);
+
+    // Restores keyboard information
+    set_cursor(terminals[terminal_dest].screen_x, terminals[terminal_dest].screen_y);
+    set_curr_idx(terminals[terminal_dest].curr_idx);
+    set_num_chars(terminals[terminal_dest].num_chars);
+    set_save_x(terminals[terminal_dest].save_x);
+    set_save_y(terminals[terminal_dest].save_y);
+    set_previous_num_chars(terminals[terminal_dest].prev_num_chars);
+
+    // Restore keyboard buff, history buff, and video buff
+    memcpy((void*)VIDEO_MEM, terminals[terminal_dest].video_buffer, FOUR_KB);
+    set_previous_buf(terminals[terminal_dest].prev_buf);
+    memcpy(buf_kb, terminals[terminal_dest].buf_kb, BUFFER_SIZE);
+
+    //Update current terminal
+    visible = terminal_dest;
     return;
 }
 
 void switch_to_task(){
-
-    //save_registers(&tss);
+    
 }
 

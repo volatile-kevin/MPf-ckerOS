@@ -27,6 +27,9 @@
 #define UP_DOWN 0X48
 #define ALT_DOWN 0x38
 #define ALT_UP 0xB8
+#define F1 0x3B
+#define F2 0x3C
+#define F3 0x3D
 
 
 #define NUMFLAGS 5
@@ -40,12 +43,40 @@
 #define ALTIDX 4
 #define IRQ_KB 1
 
+//Current number of chars in keyboard buffer
 int num_chars = 0;
-int curr_idx = 0;
-int save_x, save_y;
-char previous_buf[BUFFER_SIZE];
-int previous_num_chars;
+int get_num_chars(){return num_chars;}
+void set_num_chars(int x){num_chars = x;}
 
+//Current index of cursor in keyboard buffer
+int curr_idx = 0;
+int get_curr_idx(){return curr_idx;}
+void set_curr_idx(int x){curr_idx = x;}
+
+//We need to save screen_x and screen_y for an empty buffer for terminal history
+int save_x, save_y;
+int get_save_x(){return save_x;}
+int get_save_y(){return save_y;}
+void set_save_x(int x){save_x = x;}
+void set_save_y(int x){save_y = x;}
+
+//This holds the previous command and tells how long the previous command was without \n
+char previous_buf[BUFFER_SIZE];
+
+//Gets the previous buffer
+void get_previous_buf(char* target_buf){
+    memset(target_buf, 0, BUFFER_SIZE);
+    memcpy(target_buf, previous_buf, BUFFER_SIZE);
+}
+//Sets the previous buffer
+void set_previous_buf(char* source_buf){
+    memset(previous_buf, 0, BUFFER_SIZE);
+    memcpy(previous_buf, source_buf, BUFFER_SIZE);
+}
+
+int previous_num_chars;
+int get_previous_num_chars(){return previous_num_chars;}
+void set_previous_num_chars(int x){previous_num_chars = x;}
 // array of characters, indicies map to scan codes on keyboard
 char char_array[NUM_CHARACTERS] = {0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0, 0,
 	 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 0, 0, 'a', 's',
@@ -85,30 +116,6 @@ void init_keyboard(){
 		enter_flag = 1;
 }
 
-void kb_terminal_switch_helper(int f_scancode){
-// (((scanCode == 0x3B) || (scanCode == 0x3C) || (scanCode == 0x3D)
-    int to_switch;
-   
-    if (f_scancode == 0x3B){
-        to_switch = 0;
-    }
-    else if (f_scancode == 0x3C){
-        to_switch = 1;
-    }
-    else{
-        to_switch = 2;
-    }
-
-    // if visible terminal is the one we are currently on, do nothing
-    if (visible == to_switch){
-        return;
-    }
-    // if not, call to switch
-    else {
-        switch_terminal(to_switch);
-        return;
-    }
-}
 /*
  * keyboard_handler
  *   DESCRIPTION: Takes input from keyboard and displays it
@@ -165,9 +172,11 @@ void keyboard_handler(){
             send_eoi(IRQ_KB);
             return;
         case UP_DOWN: // up pressed
+            //Clear the video memory until the currently typed command is gone
             while(get_screen_x() != save_x && get_screen_y() != save_y){
                 backspace();
             }
+            //restore the old buffer and info
             memmove(&buf_kb, &previous_buf, BUFFER_SIZE);
             num_chars = previous_num_chars;
             curr_idx = num_chars;
@@ -208,9 +217,12 @@ void keyboard_handler(){
     // Handles enter.
     // We want a clean buffer and a new line each time we hit enter
     else if (scanCode == ENTER){
-
-        memmove(previous_buf, buf_kb, BUFFER_SIZE);
-        previous_num_chars = num_chars;
+        //Clear the previous buffer then move the current buffer into it if there's something in the buffer
+        if(num_chars) {
+            memset(previous_buf, 0, BUFFER_SIZE);
+            memmove(previous_buf, buf_kb, num_chars);
+            previous_num_chars = num_chars;
+        }
         buf_kb[curr_idx] = '\n';
         // ****************** Call terminal read *******************
         putc('\n');
@@ -219,8 +231,8 @@ void keyboard_handler(){
         num_chars = 0;
     }
     // f1, f2, f3
-    else if (((scanCode == 0x3B) || (scanCode == 0x3C) || (scanCode == 0x3D)) && flag_arr[ALTIDX]){
-        kb_terminal_switch_helper(scanCode);
+    else if (((scanCode == F1) || (scanCode == F2) || (scanCode == F3)) && flag_arr[ALTIDX]){
+        switch_terminal(scanCode - F1);
     }
 
 // l-shift, r-shift, l-ctrl, r-ctrl, caps-lock, enter

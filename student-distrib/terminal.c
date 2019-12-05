@@ -9,7 +9,7 @@
 #include "schedule.h"
 #include "types.h"
 
-/*
+/**
  * terminal_read
  *   DESCRIPTION: reads FROM the keyboard buffer into buf, return number of bytes read
  *   INPUTS: fd - file descriptor
@@ -54,12 +54,13 @@ int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
   max = max < count ? max : count;
   // move that data into internal buffer from our kb buffer
   memmove(buf, &buf_kb,max);
-  //printf("%s\n", buf);
+
+  //Clear the buffer
   enter_flag = 1;
   return max;
 }
 
-/*
+/**
  * terminal_write
  *   DESCRIPTION: writes TO the screen from buf, return number of bytes written or -1
  *   INPUTS: fd - file descriptor
@@ -81,7 +82,7 @@ int32_t terminal_write (int32_t fd, const void* buf, int32_t nbytes){
     return count;
 }
 
-/*
+/**
  * terminal_open
  *   DESCRIPTION: initializes terminal stuff (or nothing), return 0
  *   INPUTS: filename - name of terminal file to open
@@ -93,7 +94,7 @@ int32_t terminal_open (const uint8_t* filename){
     return 0;
 }
 
-/*
+/**
  * terminal_close
  *   DESCRIPTION: clears any terminal specific variables (or do nothing), return 0
  *   INPUTS: fd - file descriptor
