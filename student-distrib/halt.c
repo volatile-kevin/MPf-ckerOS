@@ -7,6 +7,7 @@
 #include "x86_desc.h"
 #include "paging.h"
 #include "execute.h"
+#include "schedule.h"
 
 #define NUMPROCESS 6
 #define FDTSIZE 8
@@ -78,6 +79,9 @@ int32_t halt(uint8_t status){
     // update the tss
     tss.ss0 = PCB_array[curr_pcb].ss0;
     tss.esp0 = PCB_array[curr_pcb].esp0;
+
+    //update the current terminal's running process
+    terminals[visible].curr_process = parent_pid;
 
     // allocate page
     map_page((void*)((parent_pid + PIDOFF)*FOUR_MB), (void*)VADDR, PFLAGS);

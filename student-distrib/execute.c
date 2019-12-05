@@ -6,6 +6,7 @@
 #include "pcb.h"
 #include "paging.h"
 #include "lib.h"
+#include "schedule.h"
 
 #define HEADERSIZE 28
 #define MAXBYTES 0x3B8000
@@ -121,6 +122,9 @@ int execute(const uint8_t* fname, uint8_t switch_after_creation){
   }
   // set active
   PCB_array[pid].state = 0;
+
+  //set the running process in the visible terminal
+  terminals[visible].curr_process = pid;
 
 
   // allocate a page

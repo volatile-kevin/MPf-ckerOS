@@ -155,7 +155,8 @@ void entry(unsigned long magic, unsigned long addr) {
     init_rtc();
 //   rtc_open((const uint8_t*) " ");
    // rtc_close(1);
-    //rtc_write(1);
+    int rtc_freq = 2;
+    rtc_write(0, &rtc_freq, 2);
     /* Initialize devices, memory, filesystem, enable device interrupts on the
 
      * PIC, any other initialization stuff... */
@@ -176,8 +177,13 @@ void entry(unsigned long magic, unsigned long addr) {
     filesys_init(modStartTemp);
     pcb_filesys_init(modStartTemp);
     init_PCB();
-
     init_terminals();
+
+    cli();
+	init_PIT(20);
+	sti();
+
+    
 
 
     // int32_t fd = 0;
@@ -209,9 +215,7 @@ void entry(unsigned long magic, unsigned long addr) {
 //     launch_tests();
 #endif
     /* Execute the first program ("shell") ... */
-    cli();
-	init_PIT(20);
-	sti();
+    
     // beep(440);
     // execute((uint8_t*)"shell", 1);
     /* Spin (nicely, so we don't chew up cycles) */

@@ -16,7 +16,6 @@ typedef struct terminal_t {
     int shell_pid; //current shell that corresponds to this terminal
     uint8_t* video_buffer; //pointer to this terminals video buffer
     tss_t tss_save;
-    struct terminal_t * next; //next terminal to switch to
     char buf_kb[BUFFER_SIZE]; //keyboard buffer
     uint8_t screen_x; // screen logical location x
     uint8_t screen_y; // screen logical location y
@@ -26,8 +25,9 @@ typedef struct terminal_t {
     uint8_t save_y;
     uint8_t prev_num_chars;
     char prev_buf[BUFFER_SIZE];
-
+    uint8_t curr_process;
 } terminal_t;
+
 
 // typedef struct {
 //     uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;
@@ -48,6 +48,7 @@ extern void init_terminals();
 extern void init_PIT(uint32_t frequency);
 extern void pit_handler();
 extern void switch_terminal(uint8_t terminal_dest);
+
 
 // void init_tasks();
 // void createTask(Task *task, uint32_t flags, uint32_t *pagedir);

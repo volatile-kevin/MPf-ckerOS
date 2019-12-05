@@ -28,7 +28,8 @@
 volatile uint8_t pitCount = 0;
 volatile uint8_t pitIntrCount = 0;
 
-terminal_t* cur_terminal;
+uint8_t cur_terminal;
+
 /*
 void init_tasks(){
     asm volatile(
@@ -125,11 +126,33 @@ void pit_handler(){
     // // get rid of its data
     // inb(PIT_CMD);
     pitIntrCount++;
-    test_interrupts();
-    PCB_struct* pcb = get_current_PCB();
-
+    //test_interrupts();
+    //printf("fck\n");
+    PCB_struct* pcb;
     
+    if(pitCount < NUM_TERMINALS){
+        switch_terminal(pitCount);
+        pitCount++;
+        execute((uint8_t *) "shell", 1);
+    } else if (pitCount == NUM_TERMINALS) {
+        switch_terminal(0);
+        pitCount++;
+    }
 
+    //save the current tss state
+    PCB_array[terminals[cur_terminal].curr_process].tss_state = tss;
+    //update the scheduled terminal
+    cur_terminal = (cur_terminal + 1)%3;
+    //load the newly scheduled tss
+    tss = PCB_array[terminals[cur_terminal].curr_process].tss_state;
+
+    //page the video memory to write to
+    if (cur_terminal == visible)
+        map_video_page(0);
+    else
+        map_video_page(cur_terminal);
+
+    switch_to_task();
 }
 
 /**
@@ -162,17 +185,8 @@ void init_terminals(){
         terminals[i].save_x = 0;
         terminals[i].save_y = 0;
         terminals[i].prev_num_chars = 0;
+        terminals[i].curr_process = &PCB_array[i];
         memset(terminals[i].prev_buf, 0, BUFFER_SIZE);
-    }
-
-    i = 0;
-    if(pitCount < NUM_TERMINALS){
-        switch_terminal(pitCount);
-        execute((uint8_t *) "shell", 1);
-        pitCount++;
-    } else if (pitCount == NUM_TERMINALS) {
-        switch_terminal(0);
-        pitCount++;
     }
 }
 

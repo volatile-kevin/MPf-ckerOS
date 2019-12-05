@@ -30,5 +30,8 @@ extern uint32_t page_directory[ONE_KB] __attribute__((aligned(FOUR_KB)));
 extern uint32_t page_table[ONE_KB] __attribute__((aligned(FOUR_KB)));
 extern uint32_t user_video_page_table[ONE_KB] __attribute__((aligned(FOUR_KB)));
 
+//map a specific video page 
+void map_video_page(uint8_t terminal);
+
 
 #endif

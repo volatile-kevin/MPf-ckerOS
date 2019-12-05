@@ -123,3 +123,10 @@ int32_t vid_map(uint8_t** screen_start){
     flush_tlb();
     return 0;
 }
+
+/*
+* When scheduling, we need to map the video memory that a process rights to
+*/
+void map_video_page(uint8_t terminal){
+    page_table[VIDEO_MEM_INDEX]  = (VIDEO_MEM_INDEX + terminal)*FOUR_KB | 3;
+}
