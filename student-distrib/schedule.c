@@ -144,9 +144,9 @@ void init_terminals(){
     terminals[0].video_buffer = (uint8_t *)VIDEO_BUFFER1;
     memset((void*)VIDEO_BUFFER1, 0, FOUR_KB);
     terminals[1].video_buffer = (uint8_t *)VIDEO_BUFFER2;
-    memset((void*)VIDEO_BUFFER2, 0, FOUR_KB);
+    memset((void*)VIDEO_BUFFER2, 20, FOUR_KB);
     terminals[2].video_buffer = (uint8_t *)VIDEO_BUFFER3;
-    memset((void*)VIDEO_BUFFER3, 0, FOUR_KB);
+    memset((void*)VIDEO_BUFFER3, 40, FOUR_KB);
 
     //This for loop iterates all 3 terminal structs and sets all of the variables to 0/blank
     int i;

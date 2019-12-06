@@ -65,12 +65,10 @@ char previous_buf[BUFFER_SIZE];
 
 //Gets the previous buffer
 void get_previous_buf(char* target_buf){
-    memset(target_buf, 0, BUFFER_SIZE);
     memcpy(target_buf, previous_buf, BUFFER_SIZE);
 }
 //Sets the previous buffer
 void set_previous_buf(char* source_buf){
-    memset(previous_buf, 0, BUFFER_SIZE);
     memcpy(previous_buf, source_buf, BUFFER_SIZE);
 }
 

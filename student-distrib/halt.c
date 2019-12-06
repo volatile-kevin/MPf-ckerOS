@@ -12,7 +12,6 @@
 #define NUMPROCESS 6
 #define FDTSIZE 8
 #define PIDOFF 2
-#define VADDR 0x08000000
 #define PFLAGS 0x87
 
 // halt: halts the current process
@@ -27,8 +26,9 @@ int32_t halt(uint8_t status) {
     int i;
     int curr_pcb = terminals[cur_terminal].curr_process;
     if (PCB_array[curr_pcb].parent_pid == -1) {
-        PCB_array[curr_pcb].pcb_in_use = -1;
         while (1) {
+            PCB_array[curr_pcb].pcb_in_use = -1;
+            terminals[curr_pcb].curr_process = -1;
             printf("Ree-"); //restart the base shell
             execute((uint8_t *) "shell");
         }
@@ -45,7 +45,7 @@ int32_t halt(uint8_t status) {
     PCB_array[curr_pcb].pcb_in_use = -1;
 
     for (i = 0; i < 1023; i++) {
-        PCB_array[curr_pcb].args[i] = (uint8_t) '\0';
+        PCB_array[curr_pcb].args[i] = 0;
     }
 
     int esp = PCB_array[curr_pcb].esp;
@@ -69,11 +69,11 @@ int32_t halt(uint8_t status) {
     terminals[cur_terminal].curr_process = parent_pid;
 
     // allocate page
-    map_page((void *) ((parent_pid + PIDOFF) * FOUR_MB), (void *) VADDR, PFLAGS);
+    map_page((void *) ((parent_pid + PIDOFF) * FOUR_MB), (void *) VADDRPROGPAGE, PFLAGS);
 
     // jump to the addr of the label basically
     asm volatile(
-    "movl %0, %%esp\n\
+    "        movl %0, %%esp\n\
              movl %1, %%ebp \n\
              jmp *%2"
     : //input operands
