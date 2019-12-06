@@ -125,19 +125,12 @@ void init_keyboard(){
 void keyboard_handler(){
     // clear interrupts
     cli();
-
-    //remap to main video memory
-
-
-
 // terminal write a backspace, putc
     // initialize vars
     unsigned int scanCode;
     char output_to_display;
     // get character from keyboard port
     scanCode = inb(KEYBOARD_PORT);
-
-// l-shift, r-shift, ctrl, caps-lock, enter
 
     // check if clear was sent
     switch(scanCode){
