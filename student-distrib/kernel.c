@@ -12,7 +12,7 @@
 #include "paging.h"
 
 #include "keyboard.h"
-#include "idt2.h"
+#include "idt.h"
 #include "rtc.h"
 #include "filesys.h"
 #include "pcb.h"

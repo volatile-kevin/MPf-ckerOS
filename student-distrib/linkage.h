@@ -1,8 +1,8 @@
-#include "idt2.h"
+#include "idt.h"
 #include "x86_desc.h"
 #include "keyboard.h"
 #include "lib.h"
-#include "idt2.h"
+#include "idt.h"
 #include "rtc.h"
 #include "schedule.h"
 // calls our keyboard_handler.c function, saving all registers

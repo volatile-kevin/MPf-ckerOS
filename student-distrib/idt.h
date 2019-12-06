@@ -1,24 +1,52 @@
-// char de(); //divide error
-// char db(); //reserved  (reserved)
-// char nmi(); //nonmaskable external interrupt
-// char bp(); //breakpoint
-// char of(); //overflow
-// char br(); //bound range exceeded
-// char ud(); //invalid opcode
-// char nm(); //device not available
-// char df(); //double fault --> return zero always
-// char cpso(); //coprocessor segment overrun (reserved)
-// char ts(); //invalid tss
-// char np(); //segment not present
-// char ssf(); //stack segment fault
-// char gp(); //general protection
-// char pf(); //page fault
-// char ir(); //intel reserved do not use
-// char mf(); //x87 FPU error
-// char ac(); //alignment check ---> return zero
-// char mc(); //machine check
-// char xf(); //simd floating point exception
+#ifndef IDT
+#define IDT
 
-// // void fill_idt(unsigned long long * idt_addr);
-// // void setup_idt(void* handler_address, int irq_num);
-// void setup_idt_inplace();
+void de();
+
+void db();
+
+void nmi();
+
+void bp();
+
+void of();
+
+void br();
+
+void ud();
+
+void nm();
+
+void df();
+
+void cpso();
+
+void ts();
+
+void np();
+
+void ssf();
+
+void gp();
+
+void pf();
+
+void ir();
+
+void mf();
+
+void ac();
+
+void mc();
+
+void xf();
+
+void keyboard();
+
+void gen_purp();
+
+void setup_idt_inplace();
+
+void set_entry(int i);
+
+#endif

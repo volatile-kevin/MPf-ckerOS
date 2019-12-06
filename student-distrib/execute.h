@@ -1,4 +1,5 @@
 #pragma once
+
 #include "types.h"
 
 #define KERNEL_CS   0x0010
@@ -23,10 +24,13 @@
 
 
 void switch_to_user_mode();
-int read_ELF(const uint8_t* fname, uint8_t* buf, int32_t fd);
+
+int read_ELF(const uint8_t *fname, uint8_t *buf, int32_t fd);
+
 // void fill_pcb_member(const uint8_t* fname);
-int execute(const uint8_t* fname, uint8_t switch_after_creation);
-int load(const uint8_t* fname, uint8_t* buf);
+int execute(const uint8_t *fname, uint8_t switch_after_creation);
+
+int load(const uint8_t *fname, uint8_t *buf);
 // void switch_to_user_mode(void);
 // void read_ELF(void);
 // void execute(void);

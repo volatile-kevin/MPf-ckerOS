@@ -1,4 +1,4 @@
-#include "idt2.h"
+#include "idt.h"
 #include "x86_desc.h"
 #include "keyboard.h"
 #include "lib.h"
