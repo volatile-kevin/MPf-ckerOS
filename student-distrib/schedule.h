@@ -3,7 +3,7 @@
 
 #define BUFFER_SIZE 128
 #define NUM_TERMINALS 3
-
+#define STARTING_PIT_FREQUENCY 20
 void beep(int frequency);
 
 uint8_t visible;

@@ -18,7 +18,6 @@
 # int32_t halt (uint8_t status);
 #
 syscall_halt:
-    # TODO: might have to do some bit shifting still with %ebx
     andl $0xF, %ebx
     pushl %ebx # uint8_t status
     call sys_halt
@@ -35,8 +34,7 @@ syscall_execute:
     call sys_execute
     popl %ebx     # return from execute.c
     popal         # pop old stack data
-#    push %eax
-#    pushl (%esp)
+
     movl $0, %eax
     iret
 
@@ -123,18 +121,6 @@ syscall_vidmap:
  #
 
 syscall_handler_asm:
-    # cmp $1, %eax
-    # je syscall_halt
-    # cmp $2, %eax
-    # je syscall_execute
-    # cmp $3, %eax
-    # je syscall_read
-    # cmp $4, %eax
-    # je syscall_write
-    # cmp $5, %eax
-    # je syscall_open
-    # cmp $6, %eax
-    # je syscall_close
     cmpl $0, %eax
     jle fail_param
     cmpl $8, %eax
@@ -143,7 +129,6 @@ syscall_handler_asm:
     jmp *jump_table(,%eax,4)
 
 fail:
-    # shouldn't get here
     call syscall_handler
     # popal
     iret

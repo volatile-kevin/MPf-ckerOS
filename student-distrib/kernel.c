@@ -8,9 +8,7 @@
 #include "i8259.h"
 #include "debug.h"
 #include "tests.h"
-
 #include "paging.h"
-
 #include "keyboard.h"
 #include "idt.h"
 #include "rtc.h"
@@ -19,9 +17,8 @@
 #include "execute.h"
 #include "schedule.h"
 
-#define RUN_TESTS
 
-uint32_t* modStartTemp;
+uint32_t *modStartTemp;
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -38,7 +35,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
     /* Am I booted by a Multiboot-compliant boot loader? */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
-        printf("Invalid magic number: 0x%#x\n", (unsigned)magic);
+        printf("Invalid magic number: 0x%#x\n", (unsigned) magic);
         return;
     }
 
@@ -46,31 +43,31 @@ void entry(unsigned long magic, unsigned long addr) {
     mbi = (multiboot_info_t *) addr;
 
     /* Print out the flags. */
-    printf("flags = 0x%#x\n", (unsigned)mbi->flags);
+    printf("flags = 0x%#x\n", (unsigned) mbi->flags);
 
     /* Are mem_* valid? */
     if (CHECK_FLAG(mbi->flags, 0))
-        printf("mem_lower = %uKB, mem_upper = %uKB\n", (unsigned)mbi->mem_lower, (unsigned)mbi->mem_upper);
+        printf("mem_lower = %uKB, mem_upper = %uKB\n", (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
 
     /* Is boot_device valid? */
     if (CHECK_FLAG(mbi->flags, 1))
-        printf("boot_device = 0x%#x\n", (unsigned)mbi->boot_device);
+        printf("boot_device = 0x%#x\n", (unsigned) mbi->boot_device);
 
     /* Is the command line passed? */
     if (CHECK_FLAG(mbi->flags, 2))
-        printf("cmdline = %s\n", (char *)mbi->cmdline);
+        printf("cmdline = %s\n", (char *) mbi->cmdline);
 
     if (CHECK_FLAG(mbi->flags, 3)) {
         int mod_count = 0;
         int i;
-        module_t* mod = (module_t*)mbi->mods_addr;
-        modStartTemp = (uint32_t*)mod->mod_start;
+        module_t *mod = (module_t *) mbi->mods_addr;
+        modStartTemp = (uint32_t *) mod->mod_start;
         while (mod_count < mbi->mods_count) {
-            printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_start);
-            printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int)mod->mod_end);
+            printf("Module %d loaded at address: 0x%#x\n", mod_count, (unsigned int) mod->mod_start);
+            printf("Module %d ends at address: 0x%#x\n", mod_count, (unsigned int) mod->mod_end);
             printf("First few bytes of module:\n");
             for (i = 0; i < 16; i++) {
-                printf("0x%x ", *((char*)(mod->mod_start+i)));
+                printf("0x%x ", *((char *) (mod->mod_start + i)));
             }
             printf("\n");
             mod_count++;
@@ -87,38 +84,38 @@ void entry(unsigned long magic, unsigned long addr) {
     if (CHECK_FLAG(mbi->flags, 5)) {
         elf_section_header_table_t *elf_sec = &(mbi->elf_sec);
         printf("elf_sec: num = %u, size = 0x%#x, addr = 0x%#x, shndx = 0x%#x\n",
-                (unsigned)elf_sec->num, (unsigned)elf_sec->size,
-                (unsigned)elf_sec->addr, (unsigned)elf_sec->shndx);
+               (unsigned) elf_sec->num, (unsigned) elf_sec->size,
+               (unsigned) elf_sec->addr, (unsigned) elf_sec->shndx);
     }
 
     /* Are mmap_* valid? */
     if (CHECK_FLAG(mbi->flags, 6)) {
         memory_map_t *mmap;
         printf("mmap_addr = 0x%#x, mmap_length = 0x%x\n",
-                (unsigned)mbi->mmap_addr, (unsigned)mbi->mmap_length);
-        for (mmap = (memory_map_t *)mbi->mmap_addr;
-                (unsigned long)mmap < mbi->mmap_addr + mbi->mmap_length;
-                mmap = (memory_map_t *)((unsigned long)mmap + mmap->size + sizeof (mmap->size)))
+               (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
+        for (mmap = (memory_map_t *) mbi->mmap_addr;
+             (unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
+             mmap = (memory_map_t *) ((unsigned long) mmap + mmap->size + sizeof(mmap->size)))
             printf("    size = 0x%x, base_addr = 0x%#x%#x\n    type = 0x%x,  length    = 0x%#x%#x\n",
-                    (unsigned)mmap->size,
-                    (unsigned)mmap->base_addr_high,
-                    (unsigned)mmap->base_addr_low,
-                    (unsigned)mmap->type,
-                    (unsigned)mmap->length_high,
-                    (unsigned)mmap->length_low);
+                   (unsigned) mmap->size,
+                   (unsigned) mmap->base_addr_high,
+                   (unsigned) mmap->base_addr_low,
+                   (unsigned) mmap->type,
+                   (unsigned) mmap->length_high,
+                   (unsigned) mmap->length_low);
     }
 
     /* Construct an LDT entry in the GDT */
     {
         seg_desc_t the_ldt_desc;
         the_ldt_desc.granularity = 0x0;
-        the_ldt_desc.opsize      = 0x1;
-        the_ldt_desc.reserved    = 0x0;
-        the_ldt_desc.avail       = 0x0;
-        the_ldt_desc.present     = 0x1;
-        the_ldt_desc.dpl         = 0x0;
-        the_ldt_desc.sys         = 0x0;
-        the_ldt_desc.type        = 0x2;
+        the_ldt_desc.opsize = 0x1;
+        the_ldt_desc.reserved = 0x0;
+        the_ldt_desc.avail = 0x0;
+        the_ldt_desc.present = 0x1;
+        the_ldt_desc.dpl = 0x0;
+        the_ldt_desc.sys = 0x0;
+        the_ldt_desc.type = 0x2;
 
         SET_LDT_PARAMS(the_ldt_desc, &ldt, ldt_size);
         ldt_desc_ptr = the_ldt_desc;
@@ -128,15 +125,15 @@ void entry(unsigned long magic, unsigned long addr) {
     /* Construct a TSS entry in the GDT */
     {
         seg_desc_t the_tss_desc;
-        the_tss_desc.granularity   = 0x0;
-        the_tss_desc.opsize        = 0x0;
-        the_tss_desc.reserved      = 0x0;
-        the_tss_desc.avail         = 0x0;
+        the_tss_desc.granularity = 0x0;
+        the_tss_desc.opsize = 0x0;
+        the_tss_desc.reserved = 0x0;
+        the_tss_desc.avail = 0x0;
         the_tss_desc.seg_lim_19_16 = TSS_SIZE & 0x000F0000;
-        the_tss_desc.present       = 0x1;
-        the_tss_desc.dpl           = 0x0;
-        the_tss_desc.sys           = 0x0;
-        the_tss_desc.type          = 0x9;
+        the_tss_desc.present = 0x1;
+        the_tss_desc.dpl = 0x0;
+        the_tss_desc.sys = 0x0;
+        the_tss_desc.type = 0x9;
         the_tss_desc.seg_lim_15_00 = TSS_SIZE & 0x0000FFFF;
 
         SET_TSS_PARAMS(the_tss_desc, &tss, tss_size);
@@ -149,75 +146,39 @@ void entry(unsigned long magic, unsigned long addr) {
         ltr(KERNEL_TSS);
     }
 
-    /* Init the PIC */
-     setup_idt_inplace();
+    //Setup idt and PIC
+    setup_idt_inplace();
     i8259_init();
+
+    //RTC Setup
     init_rtc();
-//   rtc_open((const uint8_t*) " ");
-   // rtc_close(1);
     int rtc_freq = 2;
     rtc_write(0, &rtc_freq, 2);
-    /* Initialize devices, memory, filesystem, enable device interrupts on the
 
-     * PIC, any other initialization stuff... */
-    /* Turn on paging*/
-
+    //Keyboard setup
     init_keyboard();
 
+    //Paging setup
     init_paging();
-    //init_terminals()
 
     /* Enable interrupts */
     /* Do not enable the following until after you have set up your
      * IDT correctly otherwise QEMU will triple fault and simple close
      * without showing you any output */
-    //printf("Enabling Interrupts\n");
     sti();
 
+    //Filesys and PCB setup
     filesys_init(modStartTemp);
     pcb_filesys_init(modStartTemp);
     init_PCB();
+
+    //Sets up the terminals and makes the base shells
     init_terminals();
 
-    cli();
-	init_PIT(20);
-	 sti();
-
-    
+    //Turn on the PIT
+    init_PIT(STARTING_PIT_FREQUENCY);
 
 
-    // int32_t fd = 0;
-    // int32_t nbytes = 1024;
-    // uint8_t buf[1024];
-    // int i;
-    // clear();
-    // i = file_open("frame0.txt");
-    // i = file_read(fd, buf, nbytes);
-    //
-    // unsigned j = 0;
-    // for(; j < 1024; j++){
-    //   putc(buf[j]);
-    // }
-    /*
-	dentry_t dentry;
-     int32_t i = read_dentry_by_name("verylargetextwithverylongname.tx",&dentry);
-    int32_t i = read_dentry_by_name("verylargetextwithverylongname.txt", &dentry);
-
-	uint32_t word[32];
-	i = dir_read(&word);
-	printf("filenameaksfjls: %s\n", word);
-
-    printf("%d \n", i);
-    printf("filename: %s", dentry.name);*/
-    // clear();
-#ifdef RUN_TESTS
-    /* Run tests */
-//     launch_tests();
-#endif
-    /* Execute the first program ("shell") ... */
-    
-    // beep(440);
-    // execute((uint8_t*)"shell", 1);
     /* Spin (nicely, so we don't chew up cycles) */
     asm volatile (".1: hlt; jmp .1;");
 }

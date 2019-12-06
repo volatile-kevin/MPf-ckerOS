@@ -19,47 +19,41 @@
  *   RETURN VALUE: num of bytes read
  *   SIDE EFFECTS: buf is read
  */
-int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
- 
-  while(enter_flag){
-  }
-  while (cur_terminal != visible);
-  //cli();
+int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
 
-  memset(storeargs, 0, ARG_LENGTH);
-  // if buffer size less than nbytes set max to that, otherwise set to nbytes
-  int count = 0;
+    while (enter_flag) {
+    }
+    while (cur_terminal != visible);
 
-  int spacecount = -1; //counts the number of spaces in input
-  int offset_arg = 0;  //keeps track of how many bytes we have currently written to the argument
+    memset(storeargs, 0, ARG_LENGTH);
+    // if buffer size less than nbytes set max to that, otherwise set to nbytes
+    int count = 0;
 
-  int max = BUFFER_SIZE < nbytes ? BUFFER_SIZE : nbytes;
+    int spacecount = -1; //counts the number of spaces in input
+    int offset_arg = 0;  //keeps track of how many bytes we have currently written to the argument
 
-  /*copy in the args*/
-  for (count = 0; buf_kb[count]!='\n'; count++){
-      if (spacecount > -1){
-          storeargs[offset_arg] = buf_kb[count]; //set the current byte into the arg buffer
-          offset_arg++;
-      }
+    int max = BUFFER_SIZE < nbytes ? BUFFER_SIZE : nbytes;
+    //copy in the args
+    for (count = 0; buf_kb[count] != '\n'; count++) {
+        if (spacecount > -1) {
+            storeargs[offset_arg] = buf_kb[count]; //set the current byte into the arg buffer
+            offset_arg++;
+        }
 
-      if (buf_kb[count] == ' ' && spacecount == -1){
-          spacecount++; //increment which buffer we write to
-          offset_arg = 0; //reset offset_arg bc we will be writing to new arg buffer
-          max = count;
-      }
+        if (buf_kb[count] == ' ' && spacecount == -1) {
+            spacecount++; //increment which buffer we write to
+            offset_arg = 0; //reset offset_arg bc we will be writing to new arg buffer
+            max = count;
+        }
 
-  }
+    }
+    count++;
+    max = max < count ? max : count;
+    // move that data into internal buffer from our kb buffer
+    memmove(buf, &buf_kb, max);
+    enter_flag = 1;
 
-  count++;
-
-  max = max < count ? max : count;
-  // move that data into internal buffer from our kb buffer
-  memmove(buf, &buf_kb,max);
-
-  //Clear the buffer
-  enter_flag = 1;
-  
-  return max;
+    return max;
 }
 
 /**
@@ -72,13 +66,13 @@ int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
  *   RETURN VALUE: num of bytes written
  *   SIDE EFFECTS: buf is read and written to screen
  */
-int32_t terminal_write (int32_t fd, const void* buf, int32_t nbytes){
+int32_t terminal_write(int32_t fd, const void *buf, int32_t nbytes) {
     int i;
     int count = 0;
 
     // putc up to nbytes in the buf
-    for(i = 0; i < nbytes; i++){
-        putc((*(uint8_t *)((uint32_t)buf + i)));
+    for (i = 0; i < nbytes; i++) {
+        putc((*(uint8_t *) ((uint32_t) buf + i)));
         count = count + 1;
     }
     return count;
@@ -92,7 +86,7 @@ int32_t terminal_write (int32_t fd, const void* buf, int32_t nbytes){
  *   RETURN VALUE: zero
  *   SIDE EFFECTS: terminal is ready
  */
-int32_t terminal_open (const uint8_t* filename){
+int32_t terminal_open(const uint8_t *filename) {
     return 0;
 }
 
@@ -104,7 +98,7 @@ int32_t terminal_open (const uint8_t* filename){
  *   RETURN VALUE: zero
  *   SIDE EFFECTS: terminal is cleared
  */
-int32_t terminal_close (int32_t fd){
+int32_t terminal_close(int32_t fd) {
     return 0;
 }
 
@@ -116,11 +110,11 @@ int32_t terminal_close (int32_t fd){
  * @returns = nothing, you get nothing. And you can either like it or not
  * but I really don't give a care. Not one
  */
-void terminal_getargs(uint8_t* dest, int32_t nbytes){
+void terminal_getargs(uint8_t *dest, int32_t nbytes) {
     uint32_t i = 0;
-    for (; i < nbytes; i++){
+    for (; i < nbytes; i++) {
         dest[i] = storeargs[i];
     }
-    dest[nbytes-1] = '\n'; //just in case
+    dest[nbytes - 1] = '\n'; //just in case
     return;
 }
