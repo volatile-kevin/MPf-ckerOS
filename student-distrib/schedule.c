@@ -87,9 +87,7 @@ void pit_handler(){
     );
     pitIntrCount++;
     //save the current tss state
-    PCB_array[terminals[cur_terminal].curr_process].esp0 = tss.esp0;
-    PCB_array[terminals[cur_terminal].curr_process].ss0 = tss.ss0;
-
+    terminals[cur_terminal].save_tss = tss;
     PCB_array[terminals[cur_terminal].curr_process].esp = esp;
     PCB_array[terminals[cur_terminal].curr_process].ebp = ebp;
 
@@ -107,8 +105,7 @@ void pit_handler(){
     }
 
     //load the newly scheduled tss
-    tss.esp0 = PCB_array[terminals[cur_terminal].curr_process].esp0;
-    tss.ss0 = PCB_array[terminals[cur_terminal].curr_process].ss0;
+    tss = terminals[cur_terminal].save_tss;
     esp = PCB_array[terminals[cur_terminal].curr_process].esp;
     ebp = PCB_array[terminals[cur_terminal].curr_process].ebp;
 

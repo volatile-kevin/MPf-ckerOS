@@ -14,6 +14,7 @@ typedef struct terminal_t {
     int shell_pid; //current shell that corresponds to this terminal
     uint8_t* video_buffer; //pointer to this terminals video buffer
     char buf_kb[BUFFER_SIZE]; //keyboard buffer
+    tss_t save_tss;
     uint8_t screen_x; // screen logical location x
     uint8_t screen_y; // screen logical location y
     uint8_t curr_idx; // current location in command
