@@ -29,8 +29,8 @@ int32_t halt(uint8_t status) {
     if (PCB_array[curr_pcb].parent_pid == -1) {
         PCB_array[curr_pcb].pcb_in_use = -1;
         while (1) {
-            printf("Re-"); //restart the base shell
-            execute((uint8_t *) "shell", 1);
+            printf("Ree-"); //restart the base shell
+            execute((uint8_t *) "shell");
         }
     }
     // destruct FDT
@@ -66,7 +66,7 @@ int32_t halt(uint8_t status) {
     tss.esp0 = PCB_array[curr_pcb].esp0;
 
     //update the current terminal's running process
-    terminals[visible].curr_process = parent_pid;
+    terminals[cur_terminal].curr_process = parent_pid;
 
     // allocate page
     map_page((void *) ((parent_pid + PIDOFF) * FOUR_MB), (void *) VADDR, PFLAGS);

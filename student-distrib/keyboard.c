@@ -307,9 +307,7 @@ void keyboard_handler(){
     } else {
         // A scancode that we do not currently support, its bad and should feel bad
     }
-    // restore interrupts
-    // sti();
-    // send end of interrupt signal
+
     if (cur_terminal == visible)
         map_video_page(0);
     else

@@ -2,6 +2,7 @@
  * vim:ts=4 noexpandtab */
 
 #include "lib.h"
+#include "schedule.h"
 
 #define VIDEO       0xB8000
 #define NUM_COLS    80
@@ -565,7 +566,7 @@ int8_t* strncpy(int8_t* dest, const int8_t* src, uint32_t n) {
 void test_interrupts(void) {
     int32_t i;
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-        video_mem[i*2 +1]+=8;
+        video_mem[i*2 +1]+=pitIntrCount;
     }
 }
 

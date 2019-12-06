@@ -8,11 +8,11 @@ void beep(int frequency);
 
 uint8_t visible;
 uint8_t cur_terminal;
+volatile uint8_t pitIntrCount;
 
 typedef struct terminal_t {
     int shell_pid; //current shell that corresponds to this terminal
     uint8_t* video_buffer; //pointer to this terminals video buffer
-    tss_t tss_save;
     char buf_kb[BUFFER_SIZE]; //keyboard buffer
     uint8_t screen_x; // screen logical location x
     uint8_t screen_y; // screen logical location y
@@ -25,7 +25,7 @@ typedef struct terminal_t {
     int curr_process;
 } terminal_t;
 
-terminal_t terminals[3];
+terminal_t terminals[NUM_TERMINALS];
 
 void init_terminals();
 void init_PIT(uint32_t frequency);

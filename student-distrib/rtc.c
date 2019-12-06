@@ -29,14 +29,7 @@ void rtc_handler(){
     outb(REGC, RTC_DATA);
     // get rid of its data
     inb(RTC_CMD);
-
-    //test
-     //test_interrupts();
-
-    // sti();
-    //send the EOI
     waiting = 0;
-
     send_eoi(IRQ_RTC);
 }
 
@@ -102,7 +95,6 @@ int32_t rtc_write(int32_t fd, const void* buf, int32_t nbytes){
 		else if (rate > RTC_RATE_MAX)
 			rate = RTC_RATE_MAX; //also cant be more than 15
 	}
-	//printf("RATE1: %d\n", rate);
 
 	rate &= 0x0F; //ensure it is less than 16
 	outb(NMI | 0xA, RTC_DATA); //set index to register A, disable NMI

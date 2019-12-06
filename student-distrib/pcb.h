@@ -53,7 +53,6 @@ typedef struct PCB_struct {
     int ss0;
     int return_label_add;
     int parent_pid;
-    tss_t tss_state;
     uint8_t args[TEMPBUFSIZEH];
 } PCB_struct;
 

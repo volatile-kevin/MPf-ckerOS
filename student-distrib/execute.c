@@ -54,9 +54,8 @@ int load(const uint8_t *fname, uint8_t *buf) {
 // parameters: filename
 // returns: -1 on failure, 0 on success
 // side effect: will go to userspace through context switch. Child processes will return to label before return
-int execute(const uint8_t *fname, uint8_t switch_after_creation) {
+int execute(const uint8_t *fname) {
     // copy into this buffer
-    uint8_t switch_after_creation_temp = switch_after_creation;
     uint8_t temp[MAXCOMMANDSIZE];
     memmove(temp, fname, MAXCOMMANDSIZE);
     uint8_t buf[HEADERBUFSIZE];
@@ -124,11 +123,9 @@ int execute(const uint8_t *fname, uint8_t switch_after_creation) {
 
     // do not want to switch to user when creating the terminals
     // if creating terminals, reset parent and state to -1
-    if (switch_after_creation_temp) {
-        switch_to_user_mode(firstInstruct);
-    } else {
-        PCB_array[pid].parent_pid = -1;
-    }
+
+    switch_to_user_mode(firstInstruct);
+
 
     // child processes will jump here on halt return
     __asm__ __volatile__

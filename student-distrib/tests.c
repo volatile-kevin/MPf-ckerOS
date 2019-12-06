@@ -333,7 +333,7 @@ void launch_tests() {
     init_PCB();
 
     // start the shell
-    i = execute((uint8_t *) "shell", 1);
+    i = execute((uint8_t *) "shell");
     //TEST_OUTPUT("terminal_write_works", terminal_write_works());
     //TEST_OUTPUT("terminal_read_works", terminal_read_works());
 

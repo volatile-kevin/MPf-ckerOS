@@ -22,7 +22,7 @@ int32_t sys_halt(uint8_t status) {
 // execute syscall wrapper
 // returns whatever it calls returns
 int32_t sys_execute(const uint8_t *command) {
-    return execute(command, 1);
+    return execute(command);
 }
 
 // read syscall wrapper

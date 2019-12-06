@@ -28,7 +28,7 @@ void switch_to_user_mode();
 int read_ELF(const uint8_t *fname, uint8_t *buf, int32_t fd);
 
 // void fill_pcb_member(const uint8_t* fname);
-int execute(const uint8_t *fname, uint8_t switch_after_creation);
+int execute(const uint8_t *fname);
 
 int load(const uint8_t *fname, uint8_t *buf);
 // void switch_to_user_mode(void);
