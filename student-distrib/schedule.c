@@ -88,8 +88,8 @@ void pit_handler(){
     pitIntrCount++;
     //save the current tss state
     terminals[cur_terminal].save_tss = tss;
-    PCB_array[terminals[cur_terminal].curr_process].esp = esp;
-    PCB_array[terminals[cur_terminal].curr_process].ebp = ebp;
+    PCB_array[terminals[cur_terminal].curr_process].task_esp = esp;
+    PCB_array[terminals[cur_terminal].curr_process].task_ebp = ebp;
 
     //update the scheduled terminal
     cur_terminal = (cur_terminal + 1)%NUM_TERMINALS;
@@ -106,8 +106,8 @@ void pit_handler(){
 
     //load the newly scheduled tss
     tss = terminals[cur_terminal].save_tss;
-    esp = PCB_array[terminals[cur_terminal].curr_process].esp;
-    ebp = PCB_array[terminals[cur_terminal].curr_process].ebp;
+    esp = PCB_array[terminals[cur_terminal].curr_process].task_esp;
+    ebp = PCB_array[terminals[cur_terminal].curr_process].task_ebp;
 
     //page the video memory to write to
     if (cur_terminal == visible)

@@ -49,6 +49,8 @@ typedef struct PCB_struct {
     int pcb_in_use; // -1 for empty, 0 for in use
     int esp;
     int ebp;
+    int task_esp;
+    int task_ebp;
     int esp0;
     int ss0;
     int return_label_add;
