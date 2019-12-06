@@ -6,8 +6,8 @@
 #include "pcb.h"
 #include "halt.h"
 #include "paging.h"
+#include "schedule.h"
 
-#define NUMPCBS 6
 #define TEMPBUFSIZES 1024
 
 int currPid;
@@ -63,20 +63,10 @@ int32_t sys_open (const uint8_t* filename){
     return -1;
   }
   currFD = insert_fdt(filename);
-  int j;
-
-  for(j = 0; j < NUMPCBS; j++){
-    if(PCB_array[j].state == 0){
-      currPid = j;
-    }
-  }
- 
-
-
-
+  currPid = terminals[cur_terminal].curr_process;
   return currFD;
-  // PCB_array[currPid].fd_table[fd].jump_start_idx
 }
+
 // close syscall wrapper
 // returns whatever it calls returns
 int32_t sys_close (int32_t fd){
@@ -107,10 +97,8 @@ void syscall_handler(){
 int32_t sys_getargs(uint8_t* buf, int32_t nbytes){
     PCB_struct* curpcb = get_current_PCB(); //get a pointer to the current active pcb
     terminal_getargs(curpcb->args, TEMPBUFSIZES);
-    //printf("%s", curpcb->args);
     if (curpcb->args[0] == '\0')
         return -1;
     memcpy(buf, curpcb->args, nbytes);
-    //printf("%s", curpcb->args);
     return 0;
 }

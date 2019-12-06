@@ -5,7 +5,7 @@
 #include "types.h"
 #include "x86_desc.h"
 
-
+#define NUMPCBS 6
 #define NAME_SIZE 32
 #define NUMDATABLOX 1023
 #define DENTRY_RESERVED 24
@@ -40,16 +40,13 @@ typedef struct fd_table {
     int inode_number;
     // this will be what we use to index into the jump table of all the different
     // open, close, read, and write functions
-    // TODO: add parent process
     fop* jump_start_idx;
     int fileType;
 } fd_table_entry_t;
 
 typedef struct PCB_struct {
     fd_table_entry_t fd_table[NUM_FDT_ENTRIES];
-    int process_id;
     int pcb_in_use; // -1 for empty, 0 for in use
-    int state;
     int esp;
     int ebp;
     int esp0;

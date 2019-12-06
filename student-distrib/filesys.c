@@ -37,7 +37,6 @@ void filesys_init(uint32_t* mod_start){
 
 int32_t file_load (void* buf, int32_t nbytes) {
   int32_t bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
-  // PCB.PCB_member[fd_avail].file_pos +=
   return bytes_copied;
 }
 
@@ -45,15 +44,8 @@ int32_t file_load (void* buf, int32_t nbytes) {
 // its parameters get passed into read_data, and the offset param for read_data is 0 for now
 // MUST CALL FILE_OPEN BEFORE CALLING THIS
 int32_t file_read (int32_t fd, void* buf, int32_t nbytes) {
-  // int32_t bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
-  // // PCB.PCB_member[fd_avail].file_pos +=
-  // return bytes_copied;
-  /*********************************************************************/
   PCB_struct* curPCB = get_current_PCB();
-
-
-   int32_t bytes_copied;
-
+  int32_t bytes_copied;
    if (curPCB != NULL && fd > -1){
      bytes_copied = read_data(currDentry.inodeNum, curPCB->fd_table[fd].file_pos, buf, nbytes);
      if (bytes_copied != 0){
@@ -67,16 +59,22 @@ int32_t file_read (int32_t fd, void* buf, int32_t nbytes) {
    }
 
     return bytes_copied;
-    /*********************************************************************/
-
 }
 
-// do nothing for now cp2
+/**
+ * file_write
+ * @return -1
+ * Nothing to initialize
+ */
 int file_write(){
   return -1;
 }
 
-// do nothing for now cp2
+/**
+ * file_read
+ * @return 0
+ * Nothing to tear down
+ */
 int file_close(){
   return 0;
 }
@@ -101,9 +99,8 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
   for(i = 0; i < 32; i++){
     fname[i] = 0;
   }
-	dentry_t dentry;
-	int32_t retval = read_dentry_by_index(curfile,&dentry);
-
+  dentry_t dentry;
+  int32_t retval = read_dentry_by_index(curfile,&dentry);
   strncpy((int8_t*)fname, (int8_t*)dentry.name, nbytes);
   curfile++;
   if(curfile == numdentries){
@@ -115,12 +112,20 @@ int32_t dir_read(int32_t fd, void* buf, int32_t nbytes){
   }
 }
 
-// do nothing for now cp2
+/**
+ * dir_write
+ * @return -1
+ * We have nothing to initialize
+ */
 int dir_write(){
   return -1;
 }
 
-// do nothing for now cp2
+/**
+ * dir_read
+ * @return 0
+ * We have nothing to tear down
+ */
 int dir_close(){
   return 0;
 }
@@ -206,8 +211,6 @@ int dir_open(const uint8_t* filename){
    if(inode > numinodes || inode < 0){
      return -1;
    }
-   // start at the first actual directory entry, past "." directory
-
    // set inodeBlock to the corresponding block in memory
    // +1 skips the boot block
    inode_t* inodeBlock = (inode_t*)(start_addr) + inode + 1;
@@ -216,10 +219,6 @@ int dir_open(const uint8_t* filename){
    dataBlock_t* currDataBlock = (dataBlock_t*)(start_addr) + numinodes + 1;
 
    uint32_t eofLength = inodeBlock->length;
-   /*********************************************************************/
-
-
-   /*********************************************************************/
    uint32_t eofCount = offset;
 
    // keep copying until length is 0

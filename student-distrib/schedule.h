@@ -1,14 +1,10 @@
 #include "pcb.h"
 #include "x86_desc.h"
-#include "schedule_asm.h"
 
-	
-	
 #define BUFFER_SIZE 128
 #define NUM_TERMINALS 3
 
 void beep(int frequency);
-
 
 uint8_t visible;
 uint8_t cur_terminal;
@@ -29,27 +25,9 @@ typedef struct terminal_t {
     int curr_process;
 } terminal_t;
 
-
-// typedef struct {
-//     uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;
-// } Registers;
- 
-// typedef struct Task {
-//     Registers regs;
-//     struct Task *next;
-// } Task;
-
-
-// static Task * runningTask;
-// static Task mainTask;
-// static Task otherTask;
 terminal_t terminals[3];
 
-extern void init_terminals();
-extern void init_PIT(uint32_t frequency);
-extern void pit_handler();
-extern void switch_terminal(uint8_t terminal_dest);
-
-
-// void init_tasks();
-// void createTask(Task *task, uint32_t flags, uint32_t *pagedir);
+void init_terminals();
+void init_PIT(uint32_t frequency);
+void pit_handler();
+void switch_terminal(uint8_t terminal_dest);

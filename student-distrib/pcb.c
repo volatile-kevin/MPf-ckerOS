@@ -3,19 +3,19 @@
 #include "rtc.h"
 #include "lib.h"
 #include "pcb.h"
+#include "schedule.h"
 
 #define KERNEL_PAGE_BOTTOM 0x800000
-#define NUMPCBS 6
 #define MAXFDTLEN 8
 #define SKIPSTDINSTDOUT 2
 
 
-uint8_t* start_addr;
+uint8_t *start_addr;
 uint32_t numdentries;
 uint32_t numinodes;
 uint32_t numblocks;
-dentry_t* startdentry;
-file_desc_t* fdt[MAXFDTLEN];
+dentry_t *startdentry;
+file_desc_t *fdt[MAXFDTLEN];
 
 
 // this function initializes the file filesystem
@@ -23,12 +23,12 @@ file_desc_t* fdt[MAXFDTLEN];
 // parameters: address of the bootblock in memory
 // returns: none
 // side effect: initialized the file system
-void pcb_filesys_init(uint32_t* mod_start){
-  start_addr = (uint8_t*)mod_start;
-  numdentries = *mod_start;
-  numinodes = *(mod_start + INODES_OFFSET);
-  numblocks = *(mod_start + NUMBLOCKS_OFFSET);
-  startdentry = (dentry_t*)(start_addr + SIZEOF_DENTRY);
+void pcb_filesys_init(uint32_t *mod_start) {
+    start_addr = (uint8_t *) mod_start;
+    numdentries = *mod_start;
+    numinodes = *(mod_start + INODES_OFFSET);
+    numblocks = *(mod_start + NUMBLOCKS_OFFSET);
+    startdentry = (dentry_t *) (start_addr + SIZEOF_DENTRY);
 }
 
 // structs that define what open, close, read, write should be used
@@ -39,9 +39,9 @@ fop rtc_struct = {rtc_open,
                   rtc_write};
 
 fop dir_struct = {dir_open,
-                 dir_close,
-                 dir_read,
-                 dir_write};
+                  dir_close,
+                  dir_read,
+                  dir_write};
 
 fop file_struct = {file_open,
                    file_close,
@@ -59,18 +59,16 @@ fop terminal_struct = {terminal_open,
 // parameters: none
 // returns: none
 // side effect: all PCBs is intialized correct
-void init_PCB(){
+void init_PCB() {
     int i, j;
 
     //iterate through and populate each pcb, then load into kernel page at 8 kb offsets
-    for (j = 0; j < NUMPCBS; j++){
+    for (j = 0; j < NUMPCBS; j++) {
         //mark all fd entries as not present
-        for(i = 0; i < NUM_FDT_ENTRIES; i++){
-          PCB_array[j].fd_table[i].present = -1;
+        for (i = 0; i < NUM_FDT_ENTRIES; i++) {
+            PCB_array[j].fd_table[i].present = -1;
         }
         PCB_array[j].pcb_in_use = -1;
-        PCB_array[j].process_id = j;
-        PCB_array[j].state = -1;
         //stdin members
         PCB_array[j].fd_table[0].jump_start_idx = &terminal_struct;
         PCB_array[j].fd_table[0].file_pos = 0;
@@ -81,116 +79,102 @@ void init_PCB(){
         PCB_array[j].fd_table[1].file_pos = 0;
         PCB_array[j].fd_table[1].inode_number = 0;
         PCB_array[j].fd_table[1].fileType = 3;
-      }
+    }
 }
 
 // gets next available PCB
 // parameters: none
 // returns: the pid (process id) of the next available PCB
 // side effect: the PCB with the given pid is set as in use
-int getPID(){
-  int i;
-  for(i = 0; i < NUMPCBS; i++){
-    if(PCB_array[i].pcb_in_use == -1) {
-        PCB_array[i].pcb_in_use = 0;
-        return i;
+int getPID() {
+    int i;
+    for (i = 0; i < NUMPCBS; i++) {
+        if (PCB_array[i].pcb_in_use == -1) {
+            PCB_array[i].pcb_in_use = 0;
+            return i;
+        }
     }
-  }
-  return -1;
+    return -1;
 }
 
 // Gets the next available entry in a PCB's FDT given a pid
 // parameters: process_id: id of PCB to look for available entry in FDT
 // returns: next available fd
 // side effect: that fd is set as in use
-int get_fdAvail(int process_id){
-  int i;
-  for(i = SKIPSTDINSTDOUT; i < NUM_FDT_ENTRIES; i++){
-    if(PCB_array[process_id].fd_table[i].present == -1){
-      PCB_array[process_id].fd_table[i].present = 0;
-      return i;
+int get_fdAvail(int process_id) {
+    int i;
+    for (i = SKIPSTDINSTDOUT; i < NUM_FDT_ENTRIES; i++) {
+        if (PCB_array[process_id].fd_table[i].present == -1) {
+            PCB_array[process_id].fd_table[i].present = 0;
+            return i;
+        }
     }
-  }
-  return -1;
+    return -1;
 }
 
 // Insert a new entry into a PCB's FDT
 // parameters: filename: name of file to add to FDT
 // returns: 0 on success, else -1 for failure
 // side effect: entry placed into PDB's FDT
-int insert_fdt(const uint8_t* filename){
-  int i = file_open(filename);
-  if(i == -1){
-    return -1;
-  }
-  int j, retval;
-  int currPid, currFD;
-  dentry_t dent;
-  dentry_t* currDentry = &dent;
-
-  // find active PCB
-  for(j = 0; j < NUMPCBS; j++){
-    if(PCB_array[j].state == 0){
-      currPid = j;
+int insert_fdt(const uint8_t *filename) {
+    int i = file_open(filename);
+    if (i == -1) {
+        return -1;
     }
-  }
-  currFD = get_fdAvail(currPid);
-  if(currFD == -1){
-    return -1;
-  }
-  retval = read_dentry_by_name(filename, currDentry);
-  if(retval == -1){
-    return -1;
-  }
-  // if file was able to be opened
+    int retval;
+    int currPid, currFD;
+    dentry_t dent;
+    dentry_t *currDentry = &dent;
+    currPid = terminals[cur_terminal].curr_process;
+    currFD = get_fdAvail(currPid);
+    if (currFD == -1) {
+        return -1;
+    }
+    retval = read_dentry_by_name(filename, currDentry);
+    if (retval == -1) {
+        return -1;
+    }
+    // if file was able to be opened
     // set the data in the FDT entry based on the opened file
     PCB_array[currPid].fd_table[currFD].fileType = currDentry->fileType;
     PCB_array[currPid].fd_table[currFD].inode_number = currDentry->inodeNum;
 
-  // set the correct fops stuct depending on the file type
-  switch(PCB_array[currPid].fd_table[currFD].fileType)
-  {
-    case 0:
-      PCB_array[currPid].fd_table[currFD].jump_start_idx = &rtc_struct;
-      break;
-    case 1:
-      PCB_array[currPid].fd_table[currFD].jump_start_idx = &dir_struct;
-      break;
-    case 2:
-      PCB_array[currPid].fd_table[currFD].jump_start_idx = &file_struct;
-      break;
-  }
+    // set the correct fops stuct depending on the file type
+    switch (PCB_array[currPid].fd_table[currFD].fileType) {
+        case 0:
+            PCB_array[currPid].fd_table[currFD].jump_start_idx = &rtc_struct;
+            break;
+        case 1:
+            PCB_array[currPid].fd_table[currFD].jump_start_idx = &dir_struct;
+            break;
+        case 2:
+            PCB_array[currPid].fd_table[currFD].jump_start_idx = &file_struct;
+            break;
+    }
     PCB_array[currPid].fd_table[currFD].present = 0;
 
     return currFD;
 }
 
-int remove_fd_entry(int fd){
-  int j;
-  int currPid;
-  for(j = 0; j < NUMPCBS; j++){
-    if(PCB_array[j].state == 0){
-      currPid = j;
+/**
+ * remove_fd_entry
+ * @param fd
+ * @return if the removal was successful
+ * Sets the specified fd to unused
+ */
+int remove_fd_entry(int fd) {
+    int currPid = terminals[cur_terminal].curr_process;
+    if (PCB_array[currPid].fd_table[fd].present == 0) {
+        PCB_array[currPid].fd_table[fd].present = -1;
+        return 0;
     }
-  }
-  if(PCB_array[currPid].fd_table[fd].present == 0){
-    PCB_array[currPid].fd_table[fd].present = -1;
-    return 0;
-  }
-  return -1;
+    return -1;
 }
 
 /**get_current_PCB
  * returns a pointer to the current 'in use' PCB
  * returns null if none are found
  */
-PCB_struct* get_current_PCB(){
-  int i = 0;
-  for (; i < NUMPCBS; i++){
-    if (PCB_array[i].state == 0){
-       // printf("Current PCB: %d\n\n\n\n\n", i);
-       return &PCB_array[i];
-    }
-  }
-  return NULL;
+PCB_struct *get_current_PCB() {
+    return &PCB_array[terminals[cur_terminal].curr_process];
 }
