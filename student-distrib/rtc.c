@@ -31,7 +31,7 @@ void rtc_handler(){
     inb(RTC_CMD);
 
     //test
-     test_interrupts();
+     //test_interrupts();
 
     // sti();
     //send the EOI

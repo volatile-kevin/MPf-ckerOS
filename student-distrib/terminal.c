@@ -20,12 +20,13 @@
  *   SIDE EFFECTS: buf is read
  */
 int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
+ 
   while(enter_flag){
   }
-  int i = 0;
-  for (; i < ARG_LENGTH; i++){ //can be changed to memset later
-      storeargs[i] = '\0';
-  }
+  while (cur_terminal != visible);
+  //cli();
+
+  memset(storeargs, 0, ARG_LENGTH);
   // if buffer size less than nbytes set max to that, otherwise set to nbytes
   int count = 0;
 
@@ -57,6 +58,7 @@ int32_t terminal_read (int32_t fd, void* buf, int32_t nbytes){
 
   //Clear the buffer
   enter_flag = 1;
+  
   return max;
 }
 

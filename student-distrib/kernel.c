@@ -181,7 +181,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
     cli();
 	init_PIT(20);
-	sti();
+	 sti();
 
     
 

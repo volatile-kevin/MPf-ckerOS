@@ -8,7 +8,7 @@
 #include "types.h"
 #include "terminal.h"
 #include "schedule.h"
-
+#include "paging.h"
 
 #define NUM_CHARACTERS 0x3B
 #define KEYBOARD_PORT 0x60
@@ -128,6 +128,10 @@ void keyboard_handler(){
     // clear interrupts
     cli();
 
+    //remap to main video memory
+
+
+
 // terminal write a backspace, putc
     // initialize vars
     unsigned int scanCode;
@@ -172,6 +176,7 @@ void keyboard_handler(){
             send_eoi(IRQ_KB);
             return;
         case UP_DOWN: // up pressed
+            map_video_page(0);
             //Clear the video memory until the currently typed command is gone
             while(get_screen_x() != save_x && get_screen_y() != save_y){
                 backspace();
@@ -181,6 +186,10 @@ void keyboard_handler(){
             num_chars = previous_num_chars;
             curr_idx = num_chars;
             printf(buf_kb);
+            if (cur_terminal == visible)
+                map_video_page(0);
+            else
+                map_video_page(1+cur_terminal);
             send_eoi(IRQ_KB);
             return;
         case ALT_DOWN: // alt pressed
@@ -194,7 +203,7 @@ void keyboard_handler(){
         default:
             break;
     }
-
+    map_video_page(0);
     // clear the screen
     // CLEARING THE SCREEN ALSO CLEARS THE BUFFER DONT @ ME
     if (flag_arr[CTRLIDX] && scanCode == L_SCANCODE){
@@ -203,6 +212,7 @@ void keyboard_handler(){
         curr_idx = 0;
         num_chars = 0;
         memset(&buf_kb, 0, BUFFER_SIZE);
+        
     }
 
     // Handles backspace.
@@ -300,5 +310,9 @@ void keyboard_handler(){
     // restore interrupts
     // sti();
     // send end of interrupt signal
+    if (cur_terminal == visible)
+        map_video_page(0);
+    else
+        map_video_page(1+cur_terminal);   
     send_eoi(IRQ_KB);
  }

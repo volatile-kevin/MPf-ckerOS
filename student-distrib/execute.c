@@ -102,18 +102,27 @@ int execute(const uint8_t* fname, uint8_t switch_after_creation){
   PCB_array[pid].parent_pid = -1;
   int x = 0;
   // find the active process
-  for (; x < NUMPROCESSES; x++){
-    if (PCB_array[x].state == 0){
-      PCB_array[pid].parent_pid = x;
-      PCB_array[x].state = -1;
-      break;
-    }
-  }
+  // for (; x < NUMPROCESSES; x++){
+  //   if (PCB_array[x].state == 0){
+  //     PCB_array[pid].parent_pid = x;
+  //     PCB_array[x].state = -1;
+  //     break;
+  //   }
+  // }
   // set active
-  PCB_array[pid].state = 0;
 
-  //set the running process in the visible terminal
-  terminals[visible].curr_process = pid;
+  //set parent pid if the terminal has an active process
+  if (terminals[cur_terminal].curr_process != -1){//if this terminal has an active process
+    //set the new process parent pid to active process
+    PCB_array[pid].parent_pid = terminals[cur_terminal].curr_process;
+    //set active process state to inactive
+    PCB_array[terminals[cur_terminal].curr_process].state = -1;
+    //set current terminal curr_process to newly created process
+    terminals[cur_terminal].curr_process = pid;
+  }
+
+  //set this process to active
+  PCB_array[pid].state = 0;
 
 
   // allocate a page

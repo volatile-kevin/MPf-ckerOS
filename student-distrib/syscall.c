@@ -64,11 +64,16 @@ int32_t sys_open (const uint8_t* filename){
   }
   currFD = insert_fdt(filename);
   int j;
+
   for(j = 0; j < NUMPCBS; j++){
     if(PCB_array[j].state == 0){
       currPid = j;
     }
   }
+ 
+
+
+
   return currFD;
   // PCB_array[currPid].fd_table[fd].jump_start_idx
 }

@@ -28,7 +28,6 @@
 volatile uint8_t pitCount = 0;
 volatile uint8_t pitIntrCount = 0;
 
-uint8_t cur_terminal;
 
 /*
 void init_tasks(){
@@ -120,20 +119,33 @@ void init_PIT(uint32_t frequency){
 // keeps a counter of amount of interrupts
 // should spawn new shells at 0, 1, 2 interrupts
 void pit_handler(){
+
+    cli();
     uint32_t esp;
     uint32_t ebp;
-    send_eoi(PIT_IRQ);
+    test_interrupts();
+    asm volatile ( //saving parent esp and ebp
+        "movl %%esp, %0 \n\
+         movl %%ebp, %1"
+        :"=r"(esp), "=r"(ebp) //outputs
+        : //input operands
+        :"%eax" //clobbers
+    );
 
+
+    // switch_vid(pitIntrCount%3);
     // // get rid of its data
     // inb(PIT_CMD);
     pitIntrCount++;
     //test_interrupts();
     //printf("fck\n");
-    PCB_struct* pcb;
+    // PCB_struct* pcb;
     
     if(pitCount < NUM_TERMINALS){
+       // printf("pitCount = %s\n", pitCount);
         switch_terminal(pitCount);
         pitCount++;
+        send_eoi(PIT_IRQ);
         execute((uint8_t *) "shell", 1);
     } else if (pitCount == NUM_TERMINALS) {
         switch_terminal(0);
@@ -141,6 +153,8 @@ void pit_handler(){
     }
     //save the current tss state
     PCB_array[terminals[cur_terminal].curr_process].tss_state = tss;
+    PCB_array[terminals[cur_terminal].curr_process].esp = esp;
+    PCB_array[terminals[cur_terminal].curr_process].ebp = ebp;
 
     //update the scheduled terminal
     cur_terminal = (cur_terminal + 1)%3;
@@ -148,6 +162,7 @@ void pit_handler(){
     tss = PCB_array[terminals[cur_terminal].curr_process].tss_state;
     esp = PCB_array[terminals[cur_terminal].curr_process].esp;
     ebp = PCB_array[terminals[cur_terminal].curr_process].ebp;
+
     //page the video memory to write to
     if (cur_terminal == visible)
         map_video_page(0);
@@ -155,17 +170,20 @@ void pit_handler(){
         map_video_page(1+cur_terminal);
     
     map_page((void*)((terminals[cur_terminal].curr_process + PIDOFFSET)*FOUR_MB), (void*)VADDRPROGPAGE, USWFLAGS);
-    tss.esp0 = KERNELSTACK - (terminals[cur_terminal].curr_process * EIGHTKB) - KSTACKOFFSET;
+   // tss.esp0 = KERNELSTACK - (terminals[cur_terminal].curr_process * EIGHTKB) - KSTACKOFFSET;
+    send_eoi(PIT_IRQ);
 
     // switch_to_task();
-    update_stack(esp, ebp);
-    // asm volatile(
-    //     "movl %0, %%esp\n\
-    //         movl %1, %%ebp \n\
-    //         jmp *%2"
-    //     : //input operands
-    //     : "r"(esp), "r"(ebp), "r"(return_label_address)//clobbers and goto labels
-    //     );
+    // update_stack(esp, ebp);
+    asm volatile(
+        "movl %0, %%esp\n\
+        movl %1, %%ebp"
+
+        : //input operands
+        : "r"(esp), "r"(ebp)//clobbers and goto labels
+        );
+   // sti();
+
 }
 
 /**
@@ -198,7 +216,7 @@ void init_terminals(){
         terminals[i].save_x = 0;
         terminals[i].save_y = 0;
         terminals[i].prev_num_chars = 0;
-        terminals[i].curr_process = &PCB_array[i];
+        terminals[i].curr_process = -1;
         memset(terminals[i].prev_buf, 0, BUFFER_SIZE);
     }
 }
@@ -212,6 +230,7 @@ void init_terminals(){
  * Saves and restore info that is associated with each terminal and also updates which terminal is active
  */
 void switch_terminal(uint8_t terminal_dest){
+    // printf("terminal_dest = %d\n", terminal_dest);
 
     // requested destination terminal index is the same as current (src) terminal
     if (terminal_dest == visible){
@@ -255,6 +274,48 @@ void switch_terminal(uint8_t terminal_dest){
     return;
 }
 
+void switch_vid(uint8_t terminal_dest){
+
+    // requested destination terminal index is the same as current (src) terminal
+
+    // supplied terminal indicies out of range
+    if ((terminal_dest) > NUM_TERMINALS){
+        return;
+    }
+
+    // stores keyboard information
+    terminals[visible].screen_x = get_screen_x();
+    terminals[visible].screen_y = get_screen_y();
+    terminals[visible].curr_idx = get_curr_idx();
+    terminals[visible].num_chars = get_num_chars();
+    terminals[visible].save_x = get_save_x();
+    terminals[visible].save_y = get_save_y();
+    terminals[visible].prev_num_chars = get_previous_num_chars();
+
+    // Saves the history buffer, keyboard buffer, and video buffer
+    get_previous_buf(terminals[visible].prev_buf);
+    memcpy(terminals[visible].video_buffer, (void*)VIDEO_MEM, FOUR_KB);
+    memcpy(terminals[visible].buf_kb, buf_kb, BUFFER_SIZE);
+
+    // Restores keyboard information
+    set_cursor(terminals[terminal_dest].screen_x, terminals[terminal_dest].screen_y);
+    set_curr_idx(terminals[terminal_dest].curr_idx);
+    set_num_chars(terminals[terminal_dest].num_chars);
+
+
+    set_save_x(terminals[terminal_dest].save_x);
+    set_save_y(terminals[terminal_dest].save_y);
+    set_previous_num_chars(terminals[terminal_dest].prev_num_chars);
+
+    // Restore keyboard buff, history buff, and video buff
+    // memcpy((void*)VIDEO_MEM, terminals[terminal_dest].video_buffer, FOUR_KB);
+    // set_previous_buf(terminals[terminal_dest].prev_buf);
+    // memcpy(buf_kb, terminals[terminal_dest].buf_kb, BUFFER_SIZE);
+
+    //Update current terminal
+    // visible = terminal_dest;
+    return;
+}
 void switch_to_task(){
     
 }

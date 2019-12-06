@@ -11,6 +11,7 @@ void beep(int frequency);
 
 
 uint8_t visible;
+uint8_t cur_terminal;
 
 typedef struct terminal_t {
     int shell_pid; //current shell that corresponds to this terminal
@@ -25,7 +26,7 @@ typedef struct terminal_t {
     uint8_t save_y;
     uint8_t prev_num_chars;
     char prev_buf[BUFFER_SIZE];
-    uint8_t curr_process;
+    int curr_process;
 } terminal_t;
 
 

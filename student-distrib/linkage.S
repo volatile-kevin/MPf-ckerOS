@@ -36,9 +36,7 @@ rtc_asm:
 pit_asm:
     pushal
     call pit_handler
-
-pit_return:
     popal
-    iret
+    iret 
 
 
