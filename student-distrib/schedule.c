@@ -87,6 +87,8 @@ void pit_handler(){
     if(pitCount < NUM_TERMINALS){
         switch_terminal(pitCount);
         clear();
+        terminals[cur_terminal].screen_x = get_screen_x();
+        terminals[cur_terminal].screen_y = get_screen_y();
         pitCount++;
         //send_eoi(PIT_IRQ);
         execute((uint8_t *) "shell");
@@ -151,9 +153,10 @@ void init_terminals(){
         terminals[i].prev_num_chars = 0;
         terminals[i].curr_process = -1;
         terminals[i].enter_flag = 1;
+        terminals[i].screen_start = 0;
         memset(terminals[i].prev_buf, 0, BUFFER_SIZE);
     }
-    cur_terminal = 0;
+    cur_terminal = 2;
     visible = 0;
     pitIntrCount = 0;
 }
@@ -212,7 +215,7 @@ void switch_terminal(uint8_t terminal_dest){
     if(terminals[terminal_dest].screen_start)
         user_video_page_table[0] = VIDEO_MEM | 7;
     else
-        user_video_page_table[0] = (uint32_t)terminals[visible].video_buffer | 7;
+        user_video_page_table[0] = (uint32_t)terminals[terminal_dest].video_buffer | 7;
     flush_tlb();
     //Update current terminal
     visible = terminal_dest;

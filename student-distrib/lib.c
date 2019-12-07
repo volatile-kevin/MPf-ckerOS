@@ -27,8 +27,7 @@ void clear(void) {
         *(uint8_t *)(video_mem + (i << 1)) = ' ';
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
-    update_cursor(screen_x, screen_y);
-
+    clear_kb();
 }
 /* void clear_kb(void);
  * Inputs: void
@@ -72,8 +71,6 @@ void backspace(void) {
  */
 void update_cursor(int x, int y)
 {
-    if(visible!= cur_terminal)
-        return;
     // get current position
     uint16_t pos = y * NUM_COLS + x;
 
