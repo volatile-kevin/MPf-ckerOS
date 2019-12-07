@@ -7,7 +7,7 @@
 #include "paging.h"
 #include "lib.h"
 #include "schedule.h"
-
+#include "i8259.h"
 uint32_t firstInstruct; //entrypoint of program img
 PCB_struct PCB_array[NUMPROCESSES]; //array of PCBs, maximum processes for this cp is 6
 
@@ -123,7 +123,7 @@ int execute(const uint8_t *fname) {
 
     // do not want to switch to user when creating the terminals
     // if creating terminals, reset parent and state to -1
-
+    send_eoi(PIT_IRQ);
     switch_to_user_mode(firstInstruct);
 
 

@@ -21,9 +21,10 @@
  */
 int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
 
-    while (enter_flag) {
+    while (terminals[visible].enter_flag) {
     }
     while (cur_terminal != visible);
+    cli();
 
     memset(storeargs, 0, ARG_LENGTH);
     // if buffer size less than nbytes set max to that, otherwise set to nbytes
@@ -49,10 +50,12 @@ int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
     }
     count++;
     max = max < count ? max : count;
+    max = max < nbytes ? max : nbytes;
     // move that data into internal buffer from our kb buffer
     memmove(buf, &buf_kb, max);
-    enter_flag = 1;
+    terminals[visible].enter_flag = 1;
 
+    sti();
     return max;
 }
 

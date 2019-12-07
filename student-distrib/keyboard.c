@@ -111,7 +111,7 @@ void init_keyboard(){
     // enable keyboard interrupt on the PIC
     enable_irq(IRQ_KB); //1 is the keyboard port on the pic
     buf_kb[MAXCHAR] = 0; //Set the last character in the buffer to 0
-		enter_flag = 1;
+		terminals[visible].enter_flag = 1;
 }
 
 /*
@@ -124,6 +124,7 @@ void init_keyboard(){
  */
 void keyboard_handler(){
     // clear interrupts
+    
     cli();
 // terminal write a backspace, putc
     // initialize vars
@@ -227,7 +228,7 @@ void keyboard_handler(){
         buf_kb[curr_idx] = '\n';
         // ****************** Call terminal read *******************
         putc('\n');
-        enter_flag = 0;
+        terminals[visible].enter_flag = 0;
         curr_idx = 0;
         num_chars = 0;
     }
@@ -289,6 +290,33 @@ void keyboard_handler(){
             // if the character is valid, print it
             if (output_to_display != 0){
                 // add that character to the buffer
+                if(output_to_display == 'a'){
+                    beep(262);
+                }
+                if(output_to_display == 's'){
+                    beep(294);
+                }
+                if(output_to_display == 'd'){
+                    beep(330);
+                }
+                if(output_to_display == 'f'){
+                    beep(349);
+                }
+                if(output_to_display == 'g'){
+                    beep(392);
+                }
+                if(output_to_display == 'h'){
+                    beep(440);
+                }
+                if(output_to_display == 'j'){
+                    beep(493);
+                }
+                if(output_to_display == 'k'){
+                    beep(523);
+                }
+                if(output_to_display == ' '){
+                    beep(1);
+                }                  
                 putc(output_to_display);
                 buf_kb[curr_idx] = output_to_display;
                 curr_idx++;

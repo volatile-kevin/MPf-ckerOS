@@ -21,7 +21,7 @@
 // halts by making all PCB members garbage = -1
 int32_t halt(uint8_t status) {
 
-
+    cli();
     // get the active pcb
     int i;
     int curr_pcb = terminals[cur_terminal].curr_process;
@@ -70,7 +70,7 @@ int32_t halt(uint8_t status) {
 
     // allocate page
     map_page((void *) ((parent_pid + PIDOFF) * FOUR_MB), (void *) VADDRPROGPAGE, PFLAGS);
-
+    sti();
     // jump to the addr of the label basically
     asm volatile(
     "        movl %0, %%esp\n\
@@ -79,5 +79,6 @@ int32_t halt(uint8_t status) {
     : //input operands
     : "r"(esp), "r"(ebp), "r"(return_label_address)//clobbers and goto labels
     );
+    
     return 0;
 }

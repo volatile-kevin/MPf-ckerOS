@@ -8,23 +8,7 @@
 #include "paging.h"
 #include "x86_desc.h"
 
-#define PIT0 0x40         
-#define PIT1 0x41
-#define PIT2 0x42
-#define PIT_CMD 0x43
-#define MAX_FREQ_PIT 1193180
-#define CMD_BYTE 0x36
-#define PIT_IRQ 0
-#define BYTESHIFT 8
-#define SPEAKERPORT 0x61
-#define MASK 3
 
-#define VIDEO       0xB8000
-#define NUM_COLS    80
-#define NUM_ROWS    25
-#define VIDEO_BUFFER1 (VIDEO + FOUR_KB)
-#define VIDEO_BUFFER2 (VIDEO_BUFFER1 +  FOUR_KB)
-#define VIDEO_BUFFER3 (VIDEO_BUFFER2 +  FOUR_KB)
 
 volatile uint8_t pitCount = 0;
 
@@ -46,9 +30,11 @@ void beep(int frequency)
             outb(tempA | MASK, SPEAKERPORT);
     }
 
+
     enable_irq(PIT_IRQ); //tell the PIC to enable this interrupt
 
 }
+
 
 // initialize the PIT device
 // takes in frequency of interrupts
@@ -75,7 +61,9 @@ void init_PIT(uint32_t frequency){
 // keeps a counter of amount of interrupts
 // should spawn new shells at 0, 1, 2 interrupts
 void pit_handler(){
-
+    //map_video_page(0);
+    //printf("cur term = %d\n", cur_terminal);
+    //test_interrupts();
     uint32_t esp;
     uint32_t ebp;
     asm volatile ( //saving parent esp and ebp
@@ -97,7 +85,7 @@ void pit_handler(){
     if(pitCount < NUM_TERMINALS){
         switch_terminal(pitCount);
         pitCount++;
-        send_eoi(PIT_IRQ);
+        //send_eoi(PIT_IRQ);
         execute((uint8_t *) "shell");
     } else if (pitCount == NUM_TERMINALS) {
         switch_terminal(0);
@@ -113,7 +101,7 @@ void pit_handler(){
     if (cur_terminal == visible)
         map_video_page(0);
     else
-        map_video_page(1+cur_terminal);
+        map_video_page(1+cur_terminal); //map into a video buffer (not main)
 
     map_page((void*)((terminals[cur_terminal].curr_process + PIDOFFSET)*FOUR_MB), (void*)VADDRPROGPAGE, USWFLAGS);
     asm volatile(
@@ -159,9 +147,12 @@ void init_terminals(){
         terminals[i].save_y = 0;
         terminals[i].prev_num_chars = 0;
         terminals[i].curr_process = -1;
+        terminals[i].enter_flag = 1;
         memset(terminals[i].prev_buf, 0, BUFFER_SIZE);
     }
-    cur_terminal = 2;
+    cur_terminal = 0;
+    visible = 0;
+    pitIntrCount = 0;
 }
 
 /**
@@ -173,6 +164,12 @@ void init_terminals(){
  */
 void switch_terminal(uint8_t terminal_dest){
     // requested destination terminal index is the same as current (src) terminal
+//    if (pitCount > 3){
+//     sti();
+//     while (cur_terminal != visible);
+//     cli();
+//    }
+
     if (terminal_dest == visible){
         return;
     }
@@ -211,6 +208,7 @@ void switch_terminal(uint8_t terminal_dest){
 
     //Update current terminal
     visible = terminal_dest;
+   
     return;
 }
 

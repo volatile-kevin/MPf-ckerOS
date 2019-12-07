@@ -79,6 +79,7 @@ void gp() {
 } //general protection
 void pf() {
     printf("ERROR 15\n");
+    printf("Cur terminal = %d\n", cur_terminal);
     while (1);
     return;
 } //page fault
