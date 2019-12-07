@@ -22,6 +22,7 @@ void update_cursor(int x, int y);
 int get_screen_x(void);
 int get_screen_y(void);
 void set_cursor(int x, int y);
+void set_screenxy(int x, int y);
 void* memset(void* s, int32_t c, uint32_t n);
 void* memset_word(void* s, int32_t c, uint32_t n);
 void* memset_dword(void* s, int32_t c, uint32_t n);

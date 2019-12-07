@@ -72,6 +72,8 @@ void backspace(void) {
  */
 void update_cursor(int x, int y)
 {
+    if(visible!= cur_terminal)
+        return;
     // get current position
     uint16_t pos = y * NUM_COLS + x;
 
@@ -273,6 +275,11 @@ void set_cursor(int x, int y){
     screen_x = x;
     screen_y = y;
     update_cursor(screen_x, screen_y);
+}
+
+void set_screenxy(int x, int y){
+    screen_x = x;
+    screen_y = y;
 }
 
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);

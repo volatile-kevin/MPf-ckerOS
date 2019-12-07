@@ -79,11 +79,14 @@ void pit_handler(){
     PCB_array[terminals[cur_terminal].curr_process].task_esp = esp;
     PCB_array[terminals[cur_terminal].curr_process].task_ebp = ebp;
 
+    terminals[cur_terminal].screen_x = get_screen_x();
+    terminals[cur_terminal].screen_y = get_screen_y();
     //update the scheduled terminal
     cur_terminal = (cur_terminal + 1)%NUM_TERMINALS;
 
     if(pitCount < NUM_TERMINALS){
         switch_terminal(pitCount);
+        clear();
         pitCount++;
         //send_eoi(PIT_IRQ);
         execute((uint8_t *) "shell");
@@ -102,7 +105,7 @@ void pit_handler(){
         map_video_page(0);
     else
         map_video_page(1+cur_terminal); //map into a video buffer (not main)
-
+    set_screenxy(terminals[cur_terminal].screen_x, terminals[cur_terminal].screen_y);
     map_page((void*)((terminals[cur_terminal].curr_process + PIDOFFSET)*FOUR_MB), (void*)VADDRPROGPAGE, USWFLAGS);
     asm volatile(
         "movl %0, %%esp\n\

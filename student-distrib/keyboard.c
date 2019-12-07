@@ -168,6 +168,7 @@ void keyboard_handler(){
             send_eoi(IRQ_KB);
             return;
         case UP_DOWN: // up pressed
+            set_screenxy(terminals[visible].screen_x, terminals[visible].screen_y);
             map_video_page(0);
             //Clear the video memory until the currently typed command is gone
             while(get_screen_x() != save_x && get_screen_y() != save_y){
@@ -182,6 +183,8 @@ void keyboard_handler(){
                 map_video_page(0);
             else
                 map_video_page(1+cur_terminal);
+            terminals[visible].screen_x = get_screen_x();
+            terminals[visible].screen_y = get_screen_y();
             send_eoi(IRQ_KB);
             return;
         case ALT_DOWN: // alt pressed
@@ -195,6 +198,7 @@ void keyboard_handler(){
         default:
             break;
     }
+    set_screenxy(terminals[visible].screen_x, terminals[visible].screen_y);
     map_video_page(0);
     // clear the screen
     // CLEARING THE SCREEN ALSO CLEARS THE BUFFER DONT @ ME
@@ -330,6 +334,8 @@ void keyboard_handler(){
     if (cur_terminal == visible)
         map_video_page(0);
     else
-        map_video_page(1+cur_terminal);   
+        map_video_page(1+cur_terminal);
+    terminals[visible].screen_x = get_screen_x();
+    terminals[visible].screen_y = get_screen_y();
     send_eoi(IRQ_KB);
  }

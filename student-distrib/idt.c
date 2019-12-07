@@ -4,6 +4,7 @@
 #include "lib.h"
 #include "linkage.h"
 #include "syscall_asm.h"
+#include "halt.h"
 
 #define SYSCALL_NUM 128 // 0x80
 #define NUM_IDT_ENTRIES 47 // current number of entries in our IDT we have defined
@@ -79,7 +80,6 @@ void gp() {
 } //general protection
 void pf() {
     printf("ERROR 15\n");
-    printf("Cur terminal = %d\n", cur_terminal);
     while (1);
     return;
 } //page fault

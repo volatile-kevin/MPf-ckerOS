@@ -49,14 +49,13 @@ int32_t file_read(int32_t fd, void *buf, int32_t nbytes) {
     int32_t bytes_copied;
     if (curPCB != NULL && fd > -1) {
         bytes_copied = read_data(currDentry.inodeNum, curPCB->fd_table[fd].file_pos, buf, nbytes);
-        if (bytes_copied != 0) {
+        if (bytes_copied != 0)
             curPCB->fd_table[fd].file_pos += bytes_copied;
-        } else
+        else
             curPCB->fd_table[fd].file_pos = 0;
     } else {
         bytes_copied = read_data(currDentry.inodeNum, 0, buf, nbytes);
     }
-
     return bytes_copied;
 }
 
@@ -237,10 +236,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t *buf, uint32_t length
         } else {
             currLength = length;
         }
-
-        if (offset > DATABLOCK_SIZE) {
-            tempOffset = offset % DATABLOCK_SIZE;
-        }
+        tempOffset = offset % DATABLOCK_SIZE;
         uint8_t *position = (uint8_t *) (currDataBlock) + tempOffset;
         memcpy((void *) buf, (void *) (position), currLength);
 
