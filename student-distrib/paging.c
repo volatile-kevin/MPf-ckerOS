@@ -1,6 +1,7 @@
 /* paging.c - sets up paging*/
 #include "paging.h"
 #include "types.h"
+#include "schedule.h"
 
 //For now we will use static arrays. Will try to add dynamic memory allocation later
 uint32_t page_directory[ONE_KB] __attribute__((aligned(FOUR_KB)));
@@ -117,6 +118,7 @@ void map_page(void* physaddr, void* virtualaddr, unsigned int flags){
 }
 //We use the user page table to map the spot in virtual memory to the physical memory
 int32_t vid_map(uint8_t** screen_start){
+    terminals[cur_terminal].screen_start = screen_start;
     page_directory[USER_MAP_LOC/FOUR_MB] =(unsigned int) user_video_page_table | 7; // User level permissions, 4kb page, r/w, present
     user_video_page_table[0] = (unsigned int) VIDEO_MEM | 7; // User level permissions, 4kb page, r/w, present
     *screen_start = (uint8_t*)USER_MAP_LOC;

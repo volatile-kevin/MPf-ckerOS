@@ -196,6 +196,7 @@ void switch_terminal(uint8_t terminal_dest){
     memcpy(terminals[visible].video_buffer, (void*)VIDEO_MEM, FOUR_KB);
     memcpy(terminals[visible].buf_kb, buf_kb, BUFFER_SIZE);
 
+
     // Restores keyboard information
     set_cursor(terminals[terminal_dest].screen_x, terminals[terminal_dest].screen_y);
     set_curr_idx(terminals[terminal_dest].curr_idx);
@@ -208,7 +209,11 @@ void switch_terminal(uint8_t terminal_dest){
     memcpy((void*)VIDEO_MEM, terminals[terminal_dest].video_buffer, FOUR_KB);
     set_previous_buf(terminals[terminal_dest].prev_buf);
     memcpy(buf_kb, terminals[terminal_dest].buf_kb, BUFFER_SIZE);
-
+    if(terminals[terminal_dest].screen_start)
+        user_video_page_table[0] = VIDEO_MEM | 7;
+    else
+        user_video_page_table[0] = (uint32_t)terminals[visible].video_buffer | 7;
+    flush_tlb();
     //Update current terminal
     visible = terminal_dest;
    
