@@ -48,7 +48,7 @@ int32_t file_read(int32_t fd, void *buf, int32_t nbytes) {
     PCB_struct *curPCB = get_current_PCB();
     int32_t bytes_copied;
     if (curPCB != NULL && fd > -1) {
-        bytes_copied = read_data(currDentry.inodeNum, curPCB->fd_table[fd].file_pos, buf, nbytes);
+        bytes_copied = read_data(curPCB->fd_table[fd].inode_number, curPCB->fd_table[fd].file_pos, buf, nbytes);
         if (bytes_copied != 0)
             curPCB->fd_table[fd].file_pos += bytes_copied;
         else
