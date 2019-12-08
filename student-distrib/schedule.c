@@ -181,7 +181,7 @@ void switch_terminal(uint8_t terminal_dest){
     }
 
     // supplied terminal indicies out of range
-    if ((terminal_dest) > NUM_TERMINALS){
+    if (terminal_dest > NUM_TERMINALS ){
         return;
     }
 
@@ -207,7 +207,7 @@ void switch_terminal(uint8_t terminal_dest){
     set_save_x(terminals[terminal_dest].save_x);
     set_save_y(terminals[terminal_dest].save_y);
     set_previous_num_chars(terminals[terminal_dest].prev_num_chars);
-
+    set_screenxy(terminals[terminal_dest].screen_x, terminals[terminal_dest].screen_y);
     // Restore keyboard buff, history buff, and video buff
     memcpy((void*)VIDEO_MEM, terminals[terminal_dest].video_buffer, FOUR_KB);
     set_previous_buf(terminals[terminal_dest].prev_buf);

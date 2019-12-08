@@ -28,7 +28,6 @@ void beep(int frequency);
 uint8_t visible;
 uint8_t cur_terminal;
 volatile uint8_t pitIntrCount;
-
 typedef struct terminal_t {
     int shell_pid; //current shell that corresponds to this terminal
     uint8_t* video_buffer; //pointer to this terminals video buffer

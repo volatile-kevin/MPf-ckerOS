@@ -168,6 +168,8 @@ void keyboard_handler(){
             send_eoi(IRQ_KB);
             return;
         case UP_DOWN: // up pressed
+            terminals[cur_terminal].screen_x = get_screen_x();
+            terminals[cur_terminal].screen_y = get_screen_y();
             set_screenxy(terminals[visible].screen_x, terminals[visible].screen_y);
             map_video_page(0);
             //Clear the video memory until the currently typed command is gone
@@ -185,6 +187,7 @@ void keyboard_handler(){
                 map_video_page(1+cur_terminal);
             terminals[visible].screen_x = get_screen_x();
             terminals[visible].screen_y = get_screen_y();
+            set_screenxy(terminals[cur_terminal].screen_x, terminals[cur_terminal].screen_y);
             send_eoi(IRQ_KB);
             return;
         case ALT_DOWN: // alt pressed
@@ -198,6 +201,8 @@ void keyboard_handler(){
         default:
             break;
     }
+    terminals[cur_terminal].screen_x = get_screen_x();
+    terminals[cur_terminal].screen_y = get_screen_y();
     set_screenxy(terminals[visible].screen_x, terminals[visible].screen_y);
     map_video_page(0);
     // clear the screen
@@ -238,7 +243,7 @@ void keyboard_handler(){
     }
     // f1, f2, f3
     else if (((scanCode == F1) || (scanCode == F2) || (scanCode == F3)) && flag_arr[ALTIDX]){
-        switch_terminal(scanCode - F1);
+        switch_terminal(scanCode-F1);
     }
 
 // l-shift, r-shift, l-ctrl, r-ctrl, caps-lock, enter
@@ -337,5 +342,7 @@ void keyboard_handler(){
         map_video_page(1+cur_terminal);
     terminals[visible].screen_x = get_screen_x();
     terminals[visible].screen_y = get_screen_y();
+    set_screenxy(terminals[cur_terminal].screen_x, terminals[cur_terminal].screen_y);
     send_eoi(IRQ_KB);
+    return;
  }
