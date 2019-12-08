@@ -33,6 +33,15 @@ rtc_asm:
     popal
     iret
 
+    
+#
+#       pit_asm
+#   DESCRIPTION: Linkage that stores register values before calling our c function for the pit handler
+#   INPUTS: none
+#   OUTPUTS: none
+#   RETURN VALUE: none
+#   SIDE EFFECTS: PIT is called everytime it ticks (20 Hz / 50ms)
+#
 pit_asm:
     pushal
     call pit_handler

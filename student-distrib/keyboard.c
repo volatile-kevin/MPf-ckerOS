@@ -43,6 +43,22 @@
 #define ALTIDX 4
 #define IRQ_KB 1
 
+#define MIDDLEC 262
+#define MIDDLEC_S 277
+#define MIDDLED 294
+#define MIDDLED_S 311
+#define MIDDLEE 330
+#define MIDDLEF 349
+#define MIDDLEF_S 370
+#define MIDDLEG 392
+#define MIDDLEG_S 415
+#define MIDDLEA 440
+#define MIDDLEA_S 466
+#define MIDDLEB 493
+#define HIGHC 523
+#define NONOISE 40000
+
+
 //Current number of chars in keyboard buffer
 int num_chars = 0;
 
@@ -316,41 +332,56 @@ void keyboard_handler() {
             if (output_to_display != 0) {
                 // add that character to the buffer
                 if (output_to_display == 'a') {
-                    beep(262);
+                    beep(MIDDLEC);
                 }
-                if (output_to_display == 's') {
-                    beep(294);
+                else if (output_to_display == 'w') {
+                    beep(MIDDLEC_S);
                 }
-                if (output_to_display == 'd') {
-                    beep(330);
+                else if (output_to_display == 's') {
+                    beep(MIDDLED);
                 }
-                if (output_to_display == 'f') {
-                    beep(349);
+                else if (output_to_display == 'e') {
+                    beep(MIDDLED_S);
                 }
-                if (output_to_display == 'g') {
-                    beep(392);
+                else if (output_to_display == 'd') {
+                    beep(MIDDLEE);
                 }
-                if (output_to_display == 'h') {
-                    beep(440);
+                else if (output_to_display == 'f') {
+                    beep(MIDDLEF);
                 }
-                if (output_to_display == 'j') {
-                    beep(493);
+                else if (output_to_display == 't') {
+                    beep(MIDDLEF_S);
                 }
-                if (output_to_display == 'k') {
-                    beep(523);
+                else if (output_to_display == 'g') {
+                    beep(MIDDLEG);
                 }
-                if (output_to_display == ' ') {
-                    beep(1);
+                else if (output_to_display == 'y') {
+                    beep(MIDDLEG_S);
                 }
+                else if (output_to_display == 'h') {
+                    beep(MIDDLEA);
+                }
+                else if (output_to_display == 'u') {
+                    beep(MIDDLEA_S);
+                }
+                else if (output_to_display == 'j') {
+                    beep(MIDDLEB);
+                }
+                else if (output_to_display == 'k') {
+                    beep(HIGHC);
+                }
+                
                 putc(output_to_display);
                 buf_kb[curr_idx] = output_to_display;
                 curr_idx++;
                 num_chars++;
             }
         }
-    } else {
-        // A scancode that we do not currently support, its bad and should feel bad
+    } else if ((scanCode >= 0x9E && scanCode <= 0xA5) || (scanCode == 0x91) || (scanCode == 0x92) || (scanCode >= 0x94 && scanCode <= 0x96)) {
+                beep(NONOISE);
     }
+        // A scancode that we do not currently support, its bad and should feel bad
+    
 
     if (cur_terminal == visible)
         map_video_page(0);

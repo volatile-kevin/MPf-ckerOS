@@ -8,7 +8,12 @@
 #include "paging.h"
 #include "x86_desc.h"
 
-
+#define BITMASK7 7
+#define BYTEMASK 0xFF
+#define LASTTERM 2
+#define BUFFERINIT2 20
+#define BUFFERINIT3 40
+// counter for our first 3 shells
 volatile uint8_t pitCount = 0;
 
 // makes beep!
@@ -41,8 +46,8 @@ void init_PIT(uint32_t frequency) {
 
     uint32_t divisor = MAX_FREQ_PIT / frequency;
     outb(CMD_BYTE, PIT_CMD);
-    uint8_t low = (uint8_t) (divisor & 0xFF);
-    uint8_t high = (uint8_t) ((divisor >> 8) & 0xFF);
+    uint8_t low = (uint8_t) (divisor & BYTEMASK);
+    uint8_t high = (uint8_t) ((divisor >> BYTESHIFT) & BYTEMASK);
 
     // Send the frequency divisor.
     outb(low, PIT0);
@@ -133,9 +138,9 @@ void init_terminals() {
     terminals[0].video_buffer = (uint8_t *) VIDEO_BUFFER1;
     memset((void *) VIDEO_BUFFER1, 0, FOUR_KB);
     terminals[1].video_buffer = (uint8_t *) VIDEO_BUFFER2;
-    memset((void *) VIDEO_BUFFER2, 20, FOUR_KB);
+    memset((void *) VIDEO_BUFFER2, BUFFERINIT2, FOUR_KB);
     terminals[2].video_buffer = (uint8_t *) VIDEO_BUFFER3;
-    memset((void *) VIDEO_BUFFER3, 40, FOUR_KB);
+    memset((void *) VIDEO_BUFFER3, BUFFERINIT3, FOUR_KB);
 
     //This for loop iterates all 3 terminal structs and sets all of the variables to 0/blank
     int i;
@@ -155,7 +160,7 @@ void init_terminals() {
         terminals[i].screen_start = 0;
         memset(terminals[i].prev_buf, 0, BUFFER_SIZE);
     }
-    cur_terminal = 2;
+    cur_terminal = LASTTERM;
     visible = 0;
     pitIntrCount = 0;
 }
@@ -192,7 +197,7 @@ void switch_terminal(uint8_t terminal_dest) {
     terminals[visible].save_x = get_save_x();
     terminals[visible].save_y = get_save_y();
     terminals[visible].prev_num_chars = get_previous_num_chars();
-    user_video_page_table[visible] = (uint32_t) terminals[visible].video_buffer | 7;
+    user_video_page_table[visible] = (uint32_t) terminals[visible].video_buffer | BITMASK7;
     // Saves the history buffer, keyboard buffer, and video buffer
     get_previous_buf(terminals[visible].prev_buf);
     memcpy(terminals[visible].video_buffer, (void *) VIDEO_MEM, FOUR_KB);
@@ -212,7 +217,7 @@ void switch_terminal(uint8_t terminal_dest) {
     set_previous_buf(terminals[terminal_dest].prev_buf);
     memcpy(buf_kb, terminals[terminal_dest].buf_kb, BUFFER_SIZE);
 //    if(terminals[terminal_dest].screen_start)
-    user_video_page_table[terminal_dest] = VIDEO_MEM | 7;
+    user_video_page_table[terminal_dest] = VIDEO_MEM | BITMASK7;
 //    else
 //        user_video_page_table[terminal_dest] = (uint32_t)terminals[terminal_dest].video_buffer | 7;
     flush_tlb();

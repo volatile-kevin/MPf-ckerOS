@@ -23,6 +23,10 @@
 #define VIDEO_BUFFER2 (VIDEO_BUFFER1 +  FOUR_KB)
 #define VIDEO_BUFFER3 (VIDEO_BUFFER2 +  FOUR_KB)
 
+// makes beep!
+// take in frequency that you want the computer to play
+// returns nothing
+// side effects: Enables PIT interrupts
 void beep(int frequency);
 
 uint8_t visible;
@@ -48,7 +52,36 @@ typedef struct terminal_t {
 
 terminal_t terminals[NUM_TERMINALS];
 
+/**
+ * init_terminals
+ * No Parameters
+ * No Return
+ * -----------------
+ * Initializes all information needed by terminals.
+ * Sets up the video buffers and clears all variables
+ */
 void init_terminals();
+
+
+// initialize the PIT device
+// takes in frequency of interrupts
+// returns nothing
+// side effects: enables PIT interrupts at 10 - 50ms 
 void init_PIT(uint32_t frequency);
+
+
+// handles the PIT interrupts
+// takes in nothing
+// return nothing
+// keeps a counter of amount of interrupts
+// should spawn new shells at 0, 1, 2 interrupts
 void pit_handler();
+
+/**
+ * switch_terminal
+ * @param terminal_dest
+ * Returns nothing
+ * ----------------------------
+ * Saves and restore info that is associated with each terminal and also updates which terminal is active
+ */
 void switch_terminal(uint8_t terminal_dest);
