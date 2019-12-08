@@ -40,13 +40,11 @@ int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
             storeargs[offset_arg] = buf_kb[count]; //set the current byte into the arg buffer
             offset_arg++;
         }
-
         if (buf_kb[count] == ' ' && spacecount == -1) {
             spacecount++; //increment which buffer we write to
             offset_arg = 0; //reset offset_arg bc we will be writing to new arg buffer
             max = count;
         }
-
     }
     count++;
     max = max < count ? max : count;
@@ -54,7 +52,7 @@ int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
     // move that data into internal buffer from our kb buffer
     memmove(buf, &buf_kb, max);
     terminals[visible].enter_flag = 1;
-
+    memset(buf_kb, 0, BUFFER_SIZE);
     sti();
     return max;
 }

@@ -120,8 +120,8 @@ void map_page(void* physaddr, void* virtualaddr, unsigned int flags){
 int32_t vid_map(uint8_t** screen_start){
     terminals[cur_terminal].screen_start = screen_start;
     page_directory[USER_MAP_LOC/FOUR_MB] =(unsigned int) user_video_page_table | 7; // User level permissions, 4kb page, r/w, present
-    user_video_page_table[0] = (unsigned int) VIDEO_MEM | 7; // User level permissions, 4kb page, r/w, present
-    *screen_start = (uint8_t*)USER_MAP_LOC;
+    user_video_page_table[cur_terminal] = (unsigned int) VIDEO_MEM | 7; // User level permissions, 4kb page, r/w, present
+    *screen_start = (uint8_t*)USER_MAP_LOC + cur_terminal * FOUR_KB;
     flush_tlb();
     return 0;
 }

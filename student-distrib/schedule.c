@@ -74,6 +74,7 @@ void pit_handler(){
         :"memory" //clobbers
     );
     pitIntrCount++;
+//    test_interrupts();
     //save the current tss state
     terminals[cur_terminal].save_tss = tss;
     PCB_array[terminals[cur_terminal].curr_process].task_esp = esp;
@@ -90,7 +91,7 @@ void pit_handler(){
         terminals[cur_terminal].screen_x = get_screen_x();
         terminals[cur_terminal].screen_y = get_screen_y();
         pitCount++;
-        //send_eoi(PIT_IRQ);
+        send_eoi(PIT_IRQ);
         execute((uint8_t *) "shell");
     } else if (pitCount == NUM_TERMINALS) {
         switch_terminal(0);
@@ -193,7 +194,7 @@ void switch_terminal(uint8_t terminal_dest){
     terminals[visible].save_x = get_save_x();
     terminals[visible].save_y = get_save_y();
     terminals[visible].prev_num_chars = get_previous_num_chars();
-
+    user_video_page_table[visible] = (uint32_t)terminals[visible].video_buffer | 7;
     // Saves the history buffer, keyboard buffer, and video buffer
     get_previous_buf(terminals[visible].prev_buf);
     memcpy(terminals[visible].video_buffer, (void*)VIDEO_MEM, FOUR_KB);
@@ -212,10 +213,10 @@ void switch_terminal(uint8_t terminal_dest){
     memcpy((void*)VIDEO_MEM, terminals[terminal_dest].video_buffer, FOUR_KB);
     set_previous_buf(terminals[terminal_dest].prev_buf);
     memcpy(buf_kb, terminals[terminal_dest].buf_kb, BUFFER_SIZE);
-    if(terminals[terminal_dest].screen_start)
-        user_video_page_table[0] = VIDEO_MEM | 7;
-    else
-        user_video_page_table[0] = (uint32_t)terminals[terminal_dest].video_buffer | 7;
+//    if(terminals[terminal_dest].screen_start)
+        user_video_page_table[terminal_dest] = VIDEO_MEM | 7;
+//    else
+//        user_video_page_table[terminal_dest] = (uint32_t)terminals[terminal_dest].video_buffer | 7;
     flush_tlb();
     //Update current terminal
     visible = terminal_dest;
