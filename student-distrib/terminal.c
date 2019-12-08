@@ -21,10 +21,8 @@
  */
 int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
 
-    while (terminals[visible].enter_flag) {
+    while (terminals[visible].enter_flag || cur_terminal != visible) {
     }
-    while (cur_terminal != visible);
-    cli();
 
     memset(storeargs, 0, ARG_LENGTH);
     // if buffer size less than nbytes set max to that, otherwise set to nbytes
@@ -53,7 +51,6 @@ int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
     memmove(buf, &buf_kb, max);
     terminals[visible].enter_flag = 1;
     memset(buf_kb, 0, BUFFER_SIZE);
-    sti();
     return max;
 }
 
@@ -68,7 +65,7 @@ int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
  *   SIDE EFFECTS: buf is read and written to screen
  */
 int32_t terminal_write(int32_t fd, const void *buf, int32_t nbytes) {
-    int i;
+    int i = 0;
     int count = 0;
 
     // putc up to nbytes in the buf
