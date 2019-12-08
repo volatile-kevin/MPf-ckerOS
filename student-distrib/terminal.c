@@ -20,9 +20,8 @@
  *   SIDE EFFECTS: buf is read
  */
 int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
-
-    while (terminals[visible].enter_flag || cur_terminal != visible) {
-    }
+    //Loop here until you get the correct terminal and enter is pressed
+    while (terminals[visible].enter_flag || cur_terminal != visible);
 
     memset(storeargs, 0, ARG_LENGTH);
     // if buffer size less than nbytes set max to that, otherwise set to nbytes

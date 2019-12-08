@@ -235,7 +235,7 @@ void keyboard_handler(){
             previous_num_chars = num_chars;
         }
         buf_kb[curr_idx] = '\n';
-        // ****************** Call terminal read *******************
+        // ****************** Set up for terminal read *******************
         putc('\n');
         terminals[visible].enter_flag = 0;
         curr_idx = 0;
