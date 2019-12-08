@@ -79,6 +79,6 @@ int32_t halt(uint8_t status) {
     : //input operands
     : "r"(esp), "r"(ebp), "r"(return_label_address)//clobbers and goto labels
     );
-    
+
     return 0;
 }

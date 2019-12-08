@@ -12,105 +12,105 @@
 
 void de() {
     printf("ERROR 1\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
 } //divide error
 void db() {
     printf("ERROR 2\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //reserved  (reserved)
 void nmi() {
     printf("ERROR 3\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //nonmaskable external interrupt
 void bp() {
     printf("ERROR 4\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //breakpoint
 void of() {
     printf("ERROR 5\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //overflow
 void br() {
     printf("ERROR 6\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //bound range exceeded
 void ud() {
     printf("ERROR 7\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //invalid opcode
 void nm() {
     printf("ERROR 8\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //device not available
 void df() {
     printf("ERROR 9\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //double fault --> return zero always
 void cpso() {
     printf("ERROR 10\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //coprocessor segment overrun (reserved)
 void ts() {
     printf("ERROR 11\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //invalid tss
 void np() {
     printf("ERROR 12\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //segment not present
 void ssf() {
     printf("ERROR 13\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //stack segment fault
 void gp() {
     printf("ERROR 14\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //general protection
 void pf() {
     printf("Page Fault\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //page fault
 void ir() {
     printf("ERROR 16\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //intel reserved do not use
 void mf() {
     printf("ERROR 17\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //x87 FPU error
 void ac() {
     printf("ERROR 18\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //alignment check ---> return zero
 void mc() {
     printf("ERROR 19\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //machine check
 void xf() {
     printf("ERROR 20\n");
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 } //simd floating point exception
 void gen_purp() {
-    halt((uint8_t)256);
+    halt((uint8_t) 256);
     return;
 }
 
