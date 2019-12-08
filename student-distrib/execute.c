@@ -8,6 +8,8 @@
 #include "lib.h"
 #include "schedule.h"
 #include "i8259.h"
+#include "halt.h"
+
 uint32_t firstInstruct; //entrypoint of program img
 PCB_struct PCB_array[NUMPROCESSES]; //array of PCBs, maximum processes for this cp is 6
 
@@ -63,14 +65,12 @@ int execute(const uint8_t *fname) {
     int fd_avail = -1;
     int error = read_ELF(fname, buf, fd_avail);
     if (error == -1) {
-        printf("invalid command\n");
         return -1;
     }
     // get the first available PID
     int pid = getPID();
     //error check
     if (pid == -1) {
-        printf("no more available processes\n");
         return -1;
     }
 
@@ -133,5 +133,5 @@ int execute(const uint8_t *fname) {
     "ret_label:"
     );
 
-    return 0;
+    return ret_val;
 }

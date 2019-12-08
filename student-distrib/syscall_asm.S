@@ -28,14 +28,18 @@ syscall_halt:
 # int32_t execute (const uint8 t* command);
 #
 syscall_execute:
-    pushal      # save registers
+	pushl %esi
+	pushl %edi
+	pushl %ebp
 
     pushl %ebx # const uint8_t* command
     call sys_execute
     popl %ebx     # return from execute.c
-    popal         # pop old stack data
 
-    movl $0, %eax
+	popl %ebp
+	popl %edi
+	popl %esi
+
     iret
 
 #
