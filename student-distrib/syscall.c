@@ -34,6 +34,10 @@ int32_t sys_read(int32_t fd, void *buf, int32_t nbytes) {
     if (fd < 0 || fd >= MAX_FD_INDEX || fd == 1) {
         return -1;
     }
+    if (!buf){
+        return -1;
+    }
+
     if (fd == 0) {
         return terminal_read(fd, buf, nbytes);
     } else {
@@ -49,6 +53,9 @@ int32_t sys_read(int32_t fd, void *buf, int32_t nbytes) {
 // returns whatever it calls returns
 int32_t sys_write(int32_t fd, const void *buf, int32_t nbytes) {
     if (fd < 0 || fd >= MAX_FD_INDEX || fd == 0) {
+        return -1;
+    }
+    if (!buf){
         return -1;
     }
     if (fd == 1) {

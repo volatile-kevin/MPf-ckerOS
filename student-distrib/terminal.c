@@ -23,6 +23,11 @@ int32_t terminal_read(int32_t fd, void *buf, int32_t nbytes) {
     //Loop here until you get the correct terminal and enter is pressed
     while (terminals[visible].enter_flag || cur_terminal != visible);
 
+    int i = 0;
+    while(buf_kb[i] == ' '){
+        i++;
+    }
+    memmove(buf_kb, buf_kb + i, BUFFER_SIZE - i);
     memset(storeargs, 0, ARG_LENGTH);
     // if buffer size less than nbytes set max to that, otherwise set to nbytes
     int count = 0;

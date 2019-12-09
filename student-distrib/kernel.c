@@ -152,7 +152,8 @@ void entry(unsigned long magic, unsigned long addr) {
 
     //RTC Setup
     init_rtc();
-    int rtc_freq = 2;
+    
+    int rtc_freq = 2; // initial rtc frequency of 2
     rtc_write(0, &rtc_freq, 2);
 
     //Keyboard setup

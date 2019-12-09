@@ -64,7 +64,10 @@ int32_t file_read(int32_t fd, void *buf, int32_t nbytes) {
  * @return -1
  * Nothing to initialize
  */
-int file_write() {
+int file_write(int32_t fd, const void *buf, int32_t nbytes) {
+    (void) fd;
+    (void) nbytes;
+    (void) buf;
     return -1;
 }
 
@@ -73,8 +76,9 @@ int file_write() {
  * @return 0
  * Nothing to tear down
  */
-int file_close() {
-    return 0;
+int file_close(int32_t fd) {
+    (void) fd;
+    return -1;
 }
 
 // this function prepares a file to be read
@@ -114,7 +118,10 @@ int32_t dir_read(int32_t fd, void *buf, int32_t nbytes) {
  * @return -1
  * We have nothing to initialize
  */
-int dir_write() {
+int dir_write(int32_t fd, const void *buf, int32_t nbytes) {
+    (void) fd;
+    (void) nbytes;
+    (void) buf;
     return -1;
 }
 
@@ -123,8 +130,9 @@ int dir_write() {
  * @return 0
  * We have nothing to tear down
  */
-int dir_close() {
-    return 0;
+int dir_close(int32_t fd) {
+    (void) fd;
+    return -1;
 }
 
 // this function prepares a directory to be read
