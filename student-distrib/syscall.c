@@ -9,7 +9,10 @@
 #include "schedule.h"
 
 #define TEMPBUFSIZES 1024
-
+#define MAX_FD_INDEX 6
+#define MIN_FD_INDEX 2
+#define START_KERNEL 0x400000
+#define END_KERNEL 0x800000
 int currPid;
 int currFD;
 
@@ -28,7 +31,7 @@ int32_t sys_execute(const uint8_t *command) {
 // read syscall wrapper
 // returns whatever it calls returns
 int32_t sys_read(int32_t fd, void *buf, int32_t nbytes) {
-    if (fd < 0 || fd > 7 || fd == 1) {
+    if (fd < 0 || fd >= MAX_FD_INDEX || fd == 1) {
         return -1;
     }
     if (fd == 0) {
@@ -45,7 +48,7 @@ int32_t sys_read(int32_t fd, void *buf, int32_t nbytes) {
 // write syscall wrapper
 // returns whatever it calls returns
 int32_t sys_write(int32_t fd, const void *buf, int32_t nbytes) {
-    if (fd < 0 || fd > 7 || fd == 0) {
+    if (fd < 0 || fd >= MAX_FD_INDEX || fd == 0) {
         return -1;
     }
     if (fd == 1) {
@@ -74,7 +77,7 @@ int32_t sys_open(const uint8_t *filename) {
 // returns whatever it calls returns
 int32_t sys_close(int32_t fd) {
     int retval;
-    if (fd < 3 || fd > 7) {
+    if (fd <= MIN_FD_INDEX || fd >= MAX_FD_INDEX) {
         return -1;
     }
     retval = remove_fd_entry(fd);
@@ -87,7 +90,7 @@ int32_t sys_close(int32_t fd) {
 //Maps a page in the user program to the video memory in physical memory
 int32_t sys_vidmap(uint8_t **screen_start) {
     if (screen_start == (uint8_t **) 0x0 ||
-        (screen_start >= (uint8_t **) 0x400000 && screen_start < (uint8_t **) 0x800000)) {
+        (screen_start >= (uint8_t **) START_KERNEL && screen_start < (uint8_t **) END_KERNEL)) {
         return -1;
     }
     return vid_map(screen_start);

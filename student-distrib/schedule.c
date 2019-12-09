@@ -77,7 +77,7 @@ void pit_handler() {
     :"memory" //clobbers
     );
     pitIntrCount++;
-//    test_interrupts();
+    test_interrupts();
     //save the current tss state
     terminals[cur_terminal].save_tss = tss;
     PCB_array[terminals[cur_terminal].curr_process].task_esp = esp;

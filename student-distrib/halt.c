@@ -8,6 +8,7 @@
 #include "paging.h"
 #include "execute.h"
 #include "schedule.h"
+#include "terminal.h"
 
 #define NUMPROCESS 6
 #define FDTSIZE 8
@@ -34,7 +35,7 @@ int32_t halt(uint8_t status) {
         }
     }
     // destruct FDT
-    for (i = 2; i < FDTSIZE; i++) {
+    for (i = PIDOFF; i < FDTSIZE; i++) {
         PCB_array[curr_pcb].fd_table[i].file_pos = 0;
         PCB_array[curr_pcb].fd_table[i].fileType = -1;
         PCB_array[curr_pcb].fd_table[i].present = -1;
@@ -44,7 +45,7 @@ int32_t halt(uint8_t status) {
     // destruct PCB
     PCB_array[curr_pcb].pcb_in_use = -1;
 
-    for (i = 0; i < 1023; i++) {
+    for (i = 0; i < ARG_LENGTH - 1; i++) {
         PCB_array[curr_pcb].args[i] = 0;
     }
 

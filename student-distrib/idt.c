@@ -9,108 +9,109 @@
 
 #define SYSCALL_NUM 128 // 0x80
 #define NUM_IDT_ENTRIES 47 // current number of entries in our IDT we have defined
+#define KILLED_BY_EXCEPTION 256
 
 void de() {
     printf("ERROR 1\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
 } //divide error
 void db() {
     printf("ERROR 2\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //reserved  (reserved)
 void nmi() {
     printf("ERROR 3\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //nonmaskable external interrupt
 void bp() {
     printf("ERROR 4\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //breakpoint
 void of() {
     printf("ERROR 5\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //overflow
 void br() {
     printf("ERROR 6\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //bound range exceeded
 void ud() {
     printf("ERROR 7\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //invalid opcode
 void nm() {
     printf("ERROR 8\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //device not available
 void df() {
     printf("ERROR 9\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //double fault --> return zero always
 void cpso() {
     printf("ERROR 10\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //coprocessor segment overrun (reserved)
 void ts() {
     printf("ERROR 11\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //invalid tss
 void np() {
     printf("ERROR 12\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //segment not present
 void ssf() {
     printf("ERROR 13\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //stack segment fault
 void gp() {
     printf("ERROR 14\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //general protection
 void pf() {
     printf("Page Fault\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //page fault
 void ir() {
     printf("ERROR 16\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //intel reserved do not use
 void mf() {
     printf("ERROR 17\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //x87 FPU error
 void ac() {
     printf("ERROR 18\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //alignment check ---> return zero
 void mc() {
     printf("ERROR 19\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //machine check
 void xf() {
     printf("ERROR 20\n");
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 } //simd floating point exception
 void gen_purp() {
-    halt((uint8_t) 256);
+    halt((uint8_t) KILLED_BY_EXCEPTION);
     return;
 }
 
@@ -181,7 +182,6 @@ void setup_idt_inplace() {
     SET_IDT_ENTRY(idt[29], gen_purp);
     SET_IDT_ENTRY(idt[30], gen_purp);
     SET_IDT_ENTRY(idt[31], gen_purp);
-
     SET_IDT_ENTRY(idt[32], pit_asm);
     SET_IDT_ENTRY(idt[33], keyboard_asm);
     SET_IDT_ENTRY(idt[34], gen_purp);

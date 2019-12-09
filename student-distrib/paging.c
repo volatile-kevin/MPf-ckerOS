@@ -36,9 +36,9 @@ void init_paging(void) {
     //This sets the entry in the page table for video memory
 
     page_table[VIDEO_MEM_INDEX] |= 3;
-    page_table[VIDEO_MEM_INDEX + 1] |= 7;
-    page_table[VIDEO_MEM_INDEX + 2] |= 7;
-    page_table[VIDEO_MEM_INDEX + 3] |= 7;
+    page_table[VIDEO_MEM_INDEX + 1] |= 7; //Terminal 1 buffer
+    page_table[VIDEO_MEM_INDEX + 2] |= 7; // Terminal 2 buffer
+    page_table[VIDEO_MEM_INDEX + 3] |= 7; // Terminal 3 buffer
 
 
 

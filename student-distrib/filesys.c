@@ -12,7 +12,7 @@
 #define DATABLOCK_SIZE 4096
 #define MAXFILENAMESIZE 32
 #define FILENAMESIZE_NUL 31
-
+#define SIZE_FDT 8
 // global variables
 uint8_t *start_addr;
 uint32_t numdentries;
@@ -20,7 +20,7 @@ uint32_t numinodes;
 uint32_t numblocks;
 dentry_t *startdentry;
 uint32_t curfile = 1;
-file_desc_t *fdt[8];
+file_desc_t *fdt[SIZE_FDT];
 dentry_t currDentry;
 int bytescounter = 0;
 
@@ -94,7 +94,7 @@ int32_t dir_read(int32_t fd, void *buf, int32_t nbytes) {
     uint8_t *fname;
     fname = (uint8_t *) buf;
     int i;
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < MAXFILENAMESIZE; i++) {
         fname[i] = 0;
     }
     dentry_t dentry;
@@ -187,7 +187,7 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t *dentry) {
 
 //    printf("%d",strlen((int8_t*)dentry->name));
 //    return strlen((int8_t*)dentry->name);
-    return 32 < strlen((int8_t *) dentry->name) ? 32 : strlen((int8_t *) dentry->name);
+    return MAXFILENAMESIZE < strlen((int8_t *) dentry->name) ? MAXFILENAMESIZE : strlen((int8_t *) dentry->name);
 }
 
 /* inode points to data

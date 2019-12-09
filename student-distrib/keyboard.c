@@ -43,6 +43,7 @@
 #define ALTIDX 4
 #define IRQ_KB 1
 
+//Piano Frequencies
 #define MIDDLEC 262
 #define MIDDLEC_S 277
 #define MIDDLED 294
@@ -377,10 +378,12 @@ void keyboard_handler() {
                 num_chars++;
             }
         }
+		//If a key on the keyboard is released make no noise
     } else if ((scanCode >= 0x9E && scanCode <= 0xA5) || (scanCode == 0x91) || (scanCode == 0x92) || (scanCode >= 0x94 && scanCode <= 0x96)) {
                 beep(NONOISE);
-    }
-        // A scancode that we do not currently support, its bad and should feel bad
+    } else {
+		//You pressed something we don't care about
+	}
     
 
     if (cur_terminal == visible)
