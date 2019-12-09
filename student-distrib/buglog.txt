@@ -23,6 +23,7 @@ BUG 4:
     description: keyboard not outputting correct chars
     how long?: 2 hours
     fix: made sure that char array of scan codes to chars was being indexed correctly
+
 /*********************************************************************************************************************************************************************/
 MP3 checkpoint 2 bugs:
 
@@ -43,4 +44,42 @@ BUG 3:
     description: Scrolling the screen leaves the last line of text unchanged
     how long?: 20 minutes
     fix: Used part of our backspace algorithm to fill up the last line in video memory with spaces
+
+*********************************************************************************************************************************************************************/
+MP3 checkpoint 3 bugs:
+
+BUG 1:
+    description: We weren't jumping back to execute after doing halt
+    how long?: 2 hours
+    fix: Added a label in halt that jumped back to the end of execute
+
+BUG 2:
+    description: Faulting on bad input from syserr 
+    how long? 1.5 hours
+    fix: Added edge case checking to the syscall.c wrapper on the assembly code
+
+*********************************************************************************************************************************************************************/
+MP3 checkpoint 4 bugs:
+
+BUG 1:
+    description: Args passed would not be the correct size
+    how long? 1 hour
+    fix: Fixed an off by one error in getargs call
+   *********************************************************************************************************************************************************************/
+MP3 checkpoint 5 bugs:
+
+BUG 1:
+    description: We were only using one dentry at a time, but were still tracking them all
+    how long? 3 hours
+    fix: Added each dentry to the FDT within our PCB struct
+
+BUG 2: 
+    description: When scheduling, the characters typed into the keyboard were being printed out to multiple terminals 
+    how long? 1 hour
+    fix: made sure in keyboard that the keyboard output was only being mapped to the visible terminal
+
+BUG 3:
+    description: If fish is run on all three terminals, then they halt, and you run fish again on one terminal, it would appear on all three terminals
+    how long? 30 minutes
+    fix: user video page was incorrect, had to create multiple video page buffers so fish could be run on multiple terminals
     
